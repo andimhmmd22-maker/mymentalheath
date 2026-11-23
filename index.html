@@ -1,0 +1,3235 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>30-Day Mood &amp; Burnout Reset Tracker — Chrome Workspace</title>
+  <style>
+    :root {
+      /* Chrome Light Palette */
+      --chrome-frame: #dee1e6;
+      --chrome-tab-inactive: #dee1e6;
+      --chrome-tab-hover: #e8eaed;
+      --chrome-tab-active: #ffffff;
+      --chrome-toolbar: #ffffff;
+      --chrome-omnibox: #f1f3f4;
+      --chrome-omnibox-focus: #ffffff;
+      --chrome-border: #dadce0;
+      --chrome-text: #202124;
+      --chrome-text-muted: #5f6368;
+
+      /* App Surface Palette (matching Excel #17365D, #1F4E78, #0F6B78, #D9EAF7, #EEF5FA) */
+      --bg-app: #f4f7fb;
+      --bg-card: #ffffff;
+      --bg-soft: #eef5fa;
+      --bg-accent-soft: #d9eaf7;
+      --bg-warn-soft: #fce4d6;
+      --bg-success-soft: #e6f4ea;
+      --navy-dark: #17365d;
+      --navy-mid: #1f4e78;
+      --teal: #0f6b78;
+      --accent: #1a73e8;
+      --accent-hover: #1557b0;
+      --danger: #d93025;
+      --warning: #e37400;
+      --success: #188038;
+      --text-main: #1f2937;
+      --text-secondary: #4b5563;
+      --border-light: #dbe3ec;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+      --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.1);
+      --radius-md: 10px;
+      --radius-lg: 14px;
+    }
+
+    [data-theme="dark"] {
+      --chrome-frame: #202124;
+      --chrome-tab-inactive: #202124;
+      --chrome-tab-hover: #2d2e30;
+      --chrome-tab-active: #35363a;
+      --chrome-toolbar: #35363a;
+      --chrome-omnibox: #202124;
+      --chrome-omnibox-focus: #292a2d;
+      --chrome-border: #4a4d52;
+      --chrome-text: #e8eaed;
+      --chrome-text-muted: #9aa0a6;
+
+      --bg-app: #181a1f;
+      --bg-card: #24262d;
+      --bg-soft: #2a2f3a;
+      --bg-accent-soft: #1f334d;
+      --bg-warn-soft: #3c2a21;
+      --bg-success-soft: #1d3527;
+      --navy-dark: #0f2540;
+      --navy-mid: #1b3f63;
+      --teal: #148594;
+      --accent: #8ab4f8;
+      --accent-hover: #aecbfa;
+      --danger: #f28b82;
+      --warning: #fdd663;
+      --success: #81c995;
+      --text-main: #f1f3f4;
+      --text-secondary: #b0b7c3;
+      --border-light: #373b44;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg-app);
+      color: var(--text-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    /* ==================== LOGIN SCREEN ==================== */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: linear-gradient(135deg, #17365d 0%, #0f6b78 55%, #1a73e8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .login-overlay.hidden {
+      display: none;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      color: var(--text-main);
+      width: 100%;
+      max-width: 920px;
+      border-radius: 20px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .login-left {
+      background: linear-gradient(160deg, #17365d 0%, #1f4e78 65%, #0f6b78 100%);
+      color: #ffffff;
+      padding: 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .login-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      width: fit-content;
+    }
+
+    .login-left h1 {
+      font-size: 26px;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+
+    .login-left p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .login-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .login-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .login-right {
+      padding: 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .login-controls-top {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 13px 18px;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-card);
+      font-weight: 600;
+      font-size: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    .google-btn:hover {
+      background: var(--bg-soft);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .saved-accounts {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .account-chip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-soft);
+      text-align: left;
+      width: 100%;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .account-chip:hover {
+      border-color: var(--accent);
+      background: var(--bg-accent-soft);
+    }
+
+    .avatar-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .divider-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .divider-text::before, .divider-text::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border-light);
+    }
+
+    /* ==================== CHROME BROWSER SHELL ==================== */
+    .chrome-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* Tab Strip */
+    .chrome-tabstrip {
+      background: var(--chrome-frame);
+      display: flex;
+      align-items: flex-end;
+      padding: 8px 12px 0 12px;
+      gap: 4px;
+      min-height: 42px;
+      user-select: none;
+    }
+
+    .window-dots {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 10px 10px 4px;
+      flex-shrink: 0;
+    }
+
+    .win-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .win-dot.red { background: #ff5f56; }
+    .win-dot.yellow { background: #ffbd2e; }
+    .win-dot.green { background: #27c93f; }
+
+    .tabs-container {
+      display: flex;
+      align-items: flex-end;
+      flex: 1;
+      overflow-x: auto;
+      gap: 3px;
+      scrollbar-width: none;
+    }
+
+    .tabs-container::-webkit-scrollbar { display: none; }
+
+    .chrome-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 135px;
+      max-width: 220px;
+      height: 34px;
+      padding: 0 10px 0 12px;
+      border-radius: 9px 9px 0 0;
+      background: var(--chrome-tab-inactive);
+      color: var(--chrome-text-muted);
+      font-size: 12.5px;
+      font-weight: 500;
+      position: relative;
+      transition: background 0.15s, color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .chrome-tab:hover {
+      background: var(--chrome-tab-hover);
+      color: var(--chrome-text);
+    }
+
+    .chrome-tab.active {
+      background: var(--chrome-tab-active);
+      color: var(--chrome-text);
+      font-weight: 600;
+      box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .chrome-tab-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .chrome-tab-title {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+    }
+
+    .chrome-tab-close {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: var(--chrome-text-muted);
+      opacity: 0.75;
+      transition: background 0.15s, opacity 0.15s;
+    }
+
+    .chrome-tab-close:hover {
+      background: rgba(128, 128, 128, 0.25);
+      opacity: 1;
+    }
+
+    .chrome-new-tab-btn {
+      width: 28px;
+      height: 28px;
+      margin-bottom: 3px;
+      margin-left: 2px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: var(--chrome-text);
+      flex-shrink: 0;
+    }
+
+    .chrome-new-tab-btn:hover {
+      background: rgba(128, 128, 128, 0.2);
+    }
+
+    /* Chrome Toolbar / Omnibox */
+    .chrome-toolbar {
+      background: var(--chrome-toolbar);
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--chrome-border);
+    }
+
+    .nav-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--chrome-text);
+      font-size: 15px;
+      transition: background 0.15s;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: rgba(128, 128, 128, 0.15);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .omnibox {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--chrome-omnibox);
+      border: 1px solid transparent;
+      border-radius: 999px;
+      padding: 4px 14px;
+      height: 34px;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .omnibox:focus-within {
+      background: var(--chrome-omnibox-focus);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    }
+
+    .omnibox input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      color: var(--chrome-text);
+    }
+
+    .cloud-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-light);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .cloud-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .toolbar-chip {
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--chrome-omnibox);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--chrome-text);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .toolbar-chip:hover {
+      background: rgba(128, 128, 128, 0.22);
+    }
+
+    /* Chrome Bookmarks Bar (Quick Menu Launcher) */
+    .chrome-bookmarks {
+      background: var(--chrome-toolbar);
+      padding: 5px 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border-bottom: 1px solid var(--chrome-border);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .chrome-bookmarks::-webkit-scrollbar { display: none; }
+
+    .bookmark-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--chrome-text);
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    .bookmark-item:hover {
+      background: rgba(128, 128, 128, 0.14);
+    }
+
+    .bookmark-item.active-menu {
+      background: var(--bg-accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ==================== MAIN VIEWPORT ==================== */
+    .browser-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px;
+      background: var(--bg-app);
+    }
+
+    .page-container {
+      max-width: 1260px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Cards & Components */
+    .hero-banner {
+      background: linear-gradient(125deg, var(--navy-dark) 0%, var(--navy-mid) 60%, var(--teal) 100%);
+      color: #ffffff;
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .hero-banner h2 {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .hero-banner p {
+      font-size: 13.5px;
+      opacity: 0.9;
+      max-width: 720px;
+      line-height: 1.55;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .kpi-box {
+      background: var(--bg-soft);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .kpi-sub {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: opacity 0.15s, transform 0.15s, background 0.15s;
+    }
+
+    .btn:hover { opacity: 0.92; }
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary { background: var(--accent); color: #ffffff; }
+    .btn-teal { background: var(--teal); color: #ffffff; }
+    .btn-soft { background: var(--bg-accent-soft); color: var(--text-main); border: 1px solid var(--border-light); }
+    .btn-danger { background: var(--danger); color: #ffffff; }
+    .btn-outline { background: transparent; border: 1px solid var(--border-light); color: var(--text-main); }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-info { background: var(--bg-accent-soft); color: var(--accent); }
+    .badge-warn { background: var(--bg-warn-soft); color: var(--warning); }
+    .badge-success { background: var(--bg-success-soft); color: var(--success); }
+
+    .callout {
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      line-height: 1.6;
+      border-left: 4px solid var(--accent);
+      background: var(--bg-soft);
+    }
+
+    .callout.warn {
+      border-left-color: var(--warning);
+      background: var(--bg-warn-soft);
+    }
+
+    .callout.success {
+      border-left-color: var(--success);
+      background: var(--bg-success-soft);
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background: var(--navy-mid);
+      color: #ffffff;
+      text-align: left;
+      padding: 10px 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+
+    tr:nth-child(even) td {
+      background: rgba(128, 128, 128, 0.03);
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 7px 10px;
+      border-radius: 7px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 12.5px;
+      outline: none;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.16);
+    }
+
+    .cell-input {
+      min-width: 74px;
+      padding: 5px 7px;
+      font-size: 12.5px;
+    }
+
+    .score-pills {
+      display: flex;
+      gap: 4px;
+    }
+
+    .score-pill {
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: 1px solid var(--border-light);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-card);
+      transition: all 0.12s;
+    }
+
+    .score-pill.selected {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .habit-toggle {
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: 1px solid var(--border-light);
+      background: var(--bg-soft);
+      min-width: 64px;
+    }
+
+    .habit-toggle.yes {
+      background: var(--bg-success-soft);
+      color: var(--success);
+      border-color: var(--success);
+    }
+
+    .habit-toggle.no {
+      background: var(--bg-warn-soft);
+      color: var(--warning);
+      border-color: var(--warning);
+    }
+
+    /* Progress Bar */
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: var(--bg-soft);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--accent));
+      border-radius: 999px;
+      transition: width 0.35s ease;
+    }
+
+    /* Scientific Article & Citation Cards */
+    .cite-tag {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 5px;
+      background: var(--bg-accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 11.5px;
+    }
+
+    .ref-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--bg-soft);
+      border: 1px solid var(--border-light);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+
+    .ref-item a {
+      color: var(--accent);
+      word-break: break-all;
+    }
+
+    /* New Tab Tile Grid */
+    .ntp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 14px;
+    }
+
+    .ntp-tile {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 14px;
+      padding: 18px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .ntp-tile:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+      box-shadow: var(--shadow-md);
+    }
+
+    .ntp-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: var(--bg-accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    /* Modal & Toast */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.52);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 18px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      max-width: 460px;
+      width: 100%;
+      padding: 22px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--navy-dark);
+      color: #ffffff;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-md);
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Chart SVG Tooltip */
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .chart-tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: var(--navy-dark);
+      color: #fff;
+      padding: 7px 11px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 2500;
+      display: none;
+      box-shadow: var(--shadow-md);
+    }
+
+    @media (max-width: 900px) {
+      .login-card { grid-template-columns: 1fr; }
+      .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
+      .chrome-tab { min-width: 110px; }
+      .browser-viewport { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== LOGIN SCREEN (GOOGLE CLOUD) ==================== -->
+  <div id="loginOverlay" class="login-overlay">
+    <div class="login-card">
+      <div class="login-left">
+        <div>
+          <div class="login-badge">☁️ Google Cloud Sync Workspace • Chrome UI</div>
+          <h1 style="margin-top: 16px;" data-i18n="login_title">30-Day Mood &amp; Burnout Reset Tracker</h1>
+          <p data-i18n="login_subtitle">
+            Sistem pemantauan diri harian berbasis bukti ilmiah untuk mengenali pola suasana hati, energi, durasi tidur, pemicu stres, dan kebiasaan mikro selama 30 hari.
+          </p>
+        </div>
+        <ul class="login-features">
+          <li><span>🧭</span><span data-i18n="login_feat1">Antarmuka mirip Google Chrome dengan multi-tab di setiap menu.</span></li>
+          <li><span>📊</span><span data-i18n="login_feat2">Terintegrasi penuh dengan 4 sheet Excel: Panduan, Catatan Harian, Hasil &amp; Grafik, Refleksi Mingguan.</span></li>
+          <li><span>🔬</span><span data-i18n="login_feat3">Dilengkapi edukasi &amp; interpretasi ilmiah dengan sitasi Penulis (Tahun) yang terverifikasi.</span></li>
+          <li><span>☁️</span><span data-i18n="login_feat4">Penyimpanan profil Google Awan &amp; Ekspor langsung ke format Excel (.xls / .csv).</span></li>
+        </ul>
+        <div style="font-size: 11.5px; opacity: 0.78;" data-i18n="login_disclaimer">
+          Catatan etis: Alat ini untuk refleksi &amp; pemantauan diri, bukan instrumen diagnosis medis atau klinis (WHO, 2019).
+        </div>
+      </div>
+
+      <div class="login-right">
+        <div class="login-controls-top">
+          <button class="toolbar-chip" onclick="App.toggleLang()" id="loginLangBtn">🌐 ID / EN</button>
+          <button class="toolbar-chip" onclick="App.toggleTheme()" id="loginThemeBtn">🌙 Mode</button>
+        </div>
+
+        <div>
+          <h2 style="font-size: 20px; margin-bottom: 4px;" data-i18n="login_welcome">Masuk dengan Google Cloud</h2>
+          <p style="font-size: 13px; color: var(--text-secondary);" data-i18n="login_choose">
+            Pilih akun Google tersimpan atau masuk dengan akun Google baru untuk menyinkronkan data tracker Anda.
+          </p>
+        </div>
+
+        <div id="savedAccountsList" class="saved-accounts"></div>
+
+        <button class="google-btn" onclick="App.openGoogleAccountModal()">
+          <svg width="20" height="20" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          <span data-i18n="login_google_btn">Masuk dengan Akun Google Lainnya</span>
+        </button>
+
+        <div class="divider-text" data-i18n="or_text">atau</div>
+
+        <button class="btn btn-soft" style="width: 100%;" onclick="App.loginDemo()">
+          🚀 <span data-i18n="login_demo_btn">Masuk Cepat (Demo + Data Contoh 14 Hari)</span>
+        </button>
+
+        <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.5;" data-i18n="login_privacy_note">
+          Data tersimpan aman terisolasi per akun pada penyimpanan browser lokal dengan simulasi sinkronisasi awan (dapat diekspor/impor ke Google Drive kapan saja).
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CHROME SHELL ==================== -->
+  <div id="chromeShell" class="chrome-shell" style="display: none;">
+    <!-- Top Chrome Tab Strip -->
+    <div class="chrome-tabstrip">
+      <div class="window-dots" title="Window Controls">
+        <span class="win-dot red" onclick="App.logout()" title="Logout / Tutup Sesi"></span>
+        <span class="win-dot yellow" onclick="App.toggleCompact()" title="Toggle Compact View"></span>
+        <span class="win-dot green" onclick="App.toggleFullscreen()" title="Fullscreen"></span>
+      </div>
+      <div id="tabsContainer" class="tabs-container"></div>
+      <button class="chrome-new-tab-btn" onclick="App.openTab('newtab')" title="Tab Baru (+)">+</button>
+    </div>
+
+    <!-- Chrome Navigation & Omnibox Toolbar -->
+    <div class="chrome-toolbar">
+      <button id="btnBack" class="nav-btn" onclick="App.goBack()" title="Back">←</button>
+      <button id="btnForward" class="nav-btn" onclick="App.goForward()" title="Forward">→</button>
+      <button class="nav-btn" onclick="App.refreshCurrentTab()" title="Reload &amp; Sync">↻</button>
+
+      <div class="omnibox">
+        <span style="font-size: 13px;" title="Secure Cloud Workspace">🔒</span>
+        <input id="omniboxInput" type="text" aria-label="Address Bar" onkeydown="App.handleOmniboxKey(event)" />
+        <span class="badge badge-info" id="omniboxBadge">Google Cloud</span>
+      </div>
+
+      <button class="cloud-pill" onclick="App.openTab('akun')" title="Status Sinkronisasi Awan">
+        <span class="cloud-dot" id="cloudDot"></span>
+        <span id="cloudStatusText">Tersinkron</span>
+      </button>
+
+      <button class="toolbar-chip" onclick="App.toggleTheme()" id="toolbarThemeBtn" title="Mode Malam / Terang">🌙</button>
+      <button class="toolbar-chip" onclick="App.toggleLang()" id="toolbarLangBtn" title="Bahasa ID / EN">🌐 ID</button>
+
+      <button class="avatar-circle" id="toolbarAvatar" onclick="App.openTab('akun')" title="Profil Akun Google">U</button>
+    </div>
+
+    <!-- Chrome Bookmarks Bar (All Menus) -->
+    <div id="bookmarksBar" class="chrome-bookmarks"></div>
+
+    <!-- Browser Content Viewport -->
+    <main id="browserViewport" class="browser-viewport"></main>
+  </div>
+
+  <!-- ==================== MODALS & TOAST ==================== -->
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div class="modal-box" id="modalBox"></div>
+  </div>
+  <div id="chartTooltip" class="chart-tooltip"></div>
+  <div id="toastContainer" class="toast-container"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ==================== I18N DICTIONARY ==================== */
+  const I18N = {
+    id: {
+      login_title: "30-Day Mood & Burnout Reset Tracker",
+      login_subtitle: "Sistem pemantauan diri harian berbasis bukti ilmiah untuk mengenali pola suasana hati, energi, durasi tidur, pemicu stres, dan kebiasaan mikro selama 30 hari.",
+      login_feat1: "Antarmuka mirip Google Chrome dengan multi-tab di setiap menu.",
+      login_feat2: "Terintegrasi penuh dengan 4 sheet Excel: Panduan, Catatan Harian, Hasil & Grafik, Refleksi Mingguan.",
+      login_feat3: "Dilengkapi edukasi & interpretasi ilmiah dengan sitasi Penulis (Tahun) yang terverifikasi.",
+      login_feat4: "Penyimpanan profil Google Awan & Ekspor langsung ke format Excel (.xls / .csv).",
+      login_disclaimer: "Catatan etis: Alat ini untuk refleksi & pemantauan diri, bukan instrumen diagnosis medis atau klinis (WHO, 2019).",
+      login_welcome: "Masuk dengan Google Cloud",
+      login_choose: "Pilih akun Google tersimpan atau masuk dengan akun Google baru untuk menyinkronkan data tracker Anda.",
+      login_google_btn: "Masuk dengan Akun Google Lainnya",
+      or_text: "atau",
+      login_demo_btn: "Masuk Cepat (Demo + Data Contoh 14 Hari)",
+      login_privacy_note: "Data tersimpan aman terisolasi per akun pada penyimpanan browser lokal dengan simulasi sinkronisasi awan (dapat diekspor/impor ke Google Drive kapan saja).",
+      synced: "Tersinkron",
+      syncing: "Menyinkronkan...",
+      tab_newtab: "Tab Baru",
+      tab_dashboard: "Dashboard",
+      tab_panduan: "Mulai & Panduan",
+      tab_harian: "Catatan Harian",
+      tab_hasil: "Hasil & Grafik",
+      tab_ilmiah: "Hasil & Penjelasan Ilmiah",
+      tab_refleksi: "Refleksi Mingguan",
+      tab_akun: "Akun & Cloud",
+      tab_pengaturan: "Pengaturan",
+      yes: "Ya",
+      no: "Tidak",
+      unset: "Pilih...",
+      save_ok: "Data otomatis tersimpan ke Cloud Lokal.",
+      lang_switched: "Bahasa diubah ke Bahasa Indonesia."
+    },
+    en: {
+      login_title: "30-Day Mood & Burnout Reset Tracker",
+      login_subtitle: "An evidence-informed daily self-monitoring web workspace to recognize patterns in mood, energy, sleep duration, daily triggers, and micro-habits across 30 days.",
+      login_feat1: "Google Chrome-style interface with dynamic multi-tab window management.",
+      login_feat2: "Fully integrated with all 4 Excel sheets: Guide, Daily Log, Results & Charts, Weekly Reflection.",
+      login_feat3: "Includes scientific education & personalized result interpretation with verifiable Author (Year) citations.",
+      login_feat4: "Google Cloud profile storage & direct Export to Excel (.xls / .csv) and JSON.",
+      login_disclaimer: "Ethical note: This tool supports self-reflection and pattern awareness, not medical or clinical diagnosis (WHO, 2019).",
+      login_welcome: "Sign in with Google Cloud",
+      login_choose: "Choose a saved Google account or sign in with a new Google account to sync your tracker data.",
+      login_google_btn: "Sign in with Another Google Account",
+      or_text: "or",
+      login_demo_btn: "Quick Enter (Demo + 14-Day Sample Data)",
+      login_privacy_note: "Data is stored securely per account in isolated local browser storage with cloud sync simulation (exportable to Google Drive anytime).",
+      synced: "Synced",
+      syncing: "Syncing...",
+      tab_newtab: "New Tab",
+      tab_dashboard: "Dashboard",
+      tab_panduan: "Start & Guide",
+      tab_harian: "Daily Log",
+      tab_hasil: "Results & Charts",
+      tab_ilmiah: "Scientific Explanation",
+      tab_refleksi: "Weekly Reflection",
+      tab_akun: "Account & Cloud",
+      tab_pengaturan: "Settings",
+      yes: "Yes",
+      no: "No",
+      unset: "Select...",
+      save_ok: "Auto-saved to Local Cloud.",
+      lang_switched: "Language switched to English."
+    }
+  };
+
+  /* ==================== MENU / ROUTE REGISTRY ==================== */
+  const ROUTES = [
+    { id: 'dashboard', icon: '🏠', url: 'tracker://moodreset.cloud/dashboard', i18nKey: 'tab_dashboard' },
+    { id: 'panduan', icon: '📘', url: 'tracker://moodreset.cloud/mulai-dan-panduan', i18nKey: 'tab_panduan' },
+    { id: 'harian', icon: '📝', url: 'tracker://moodreset.cloud/catatan-harian', i18nKey: 'tab_harian' },
+    { id: 'hasil', icon: '📊', url: 'tracker://moodreset.cloud/hasil-dan-grafik', i18nKey: 'tab_hasil' },
+    { id: 'ilmiah', icon: '🔬', url: 'tracker://moodreset.cloud/hasil-dan-penjelasan-ilmiah', i18nKey: 'tab_ilmiah' },
+    { id: 'refleksi', icon: '🪞', url: 'tracker://moodreset.cloud/refleksi-mingguan', i18nKey: 'tab_refleksi' },
+    { id: 'akun', icon: '👤', url: 'tracker://moodreset.cloud/akun-cloud', i18nKey: 'tab_akun' },
+    { id: 'pengaturan', icon: '⚙️', url: 'tracker://moodreset.cloud/pengaturan', i18nKey: 'tab_pengaturan' }
+  ];
+
+  const TRIGGERS_ID = [
+    "Beban kerja/studi",
+    "Kurang tidur",
+    "Konflik/komunikasi",
+    "Paparan layar berlebih",
+    "Target/deadline",
+    "Keuangan",
+    "Kesehatan fisik",
+    "Tidak ada pemicu besar",
+    "Lainnya"
+  ];
+
+  const TRIGGERS_EN = [
+    "Workload / study",
+    "Sleep deprivation",
+    "Conflict / communication",
+    "Excessive screen exposure",
+    "Deadlines / targets",
+    "Finances",
+    "Physical health",
+    "No major trigger",
+    "Other"
+  ];
+
+  const REFERENCES = [
+    {
+      id: "Likert1932",
+      cite: "Likert (1932)",
+      text: "Likert, R. (1932). A technique for the measurement of attitudes. Archives of Psychology, 140, 1–55.",
+      url: "https://psycnet.apa.org/record/1933-01885-001"
+    },
+    {
+      id: "Maslach1981",
+      cite: "Maslach & Jackson (1981)",
+      text: "Maslach, C., & Jackson, S. E. (1981). The measurement of experienced burnout. Journal of Organizational Behavior, 2(2), 99–113.",
+      url: "https://doi.org/10.1002/job.4030020205"
+    },
+    {
+      id: "WHO2019",
+      cite: "WHO (2019)",
+      text: "World Health Organization. (2019). Burn-out an occupational phenomenon: International Classification of Diseases (ICD-11).",
+      url: "https://www.who.int/standards/classifications/frequently-asked-questions/burn-out-an-occupational-phenomenon"
+    },
+    {
+      id: "Schaufeli2020",
+      cite: "Schaufeli, Desart, & De Witte (2020)",
+      text: "Schaufeli, W. B., Desart, S., & De Witte, H. (2020). Burnout Assessment Tool (BAT)—Development, validity, and reliability. International Journal of Environmental Research and Public Health, 17(24), 9495.",
+      url: "https://doi.org/10.3390/ijerph17249495"
+    },
+    {
+      id: "Harkin2016",
+      cite: "Harkin et al. (2016)",
+      text: "Harkin, B., Webb, T. L., Chang, B. P. I., Prestwich, A., Conner, M., Kellar, I., Benn, Y., & Sheeran, P. (2016). Does monitoring goal progress promote goal attainment? A meta-analysis of the experimental evidence. Psychological Bulletin, 142(2), 198–229.",
+      url: "https://doi.org/10.1037/bul0000025"
+    },
+    {
+      id: "Hirshkowitz2015",
+      cite: "Hirshkowitz et al. (2015)",
+      text: "Hirshkowitz, M., Whiton, K., Albert, S. M., et al. (2015). National Sleep Foundation's sleep time duration recommendations: methodology and results summary. Sleep Health, 1(1), 40–43.",
+      url: "https://doi.org/10.1016/j.sleh.2014.12.010"
+    },
+    {
+      id: "Watson2015",
+      cite: "Watson et al. (2015)",
+      text: "Watson, N. F., Badr, M. S., Belenky, G., et al. (2015). Recommended amount of sleep for a healthy adult: A joint consensus statement of the American Academy of Sleep Medicine and Sleep Research Society. Sleep, 38(6), 843–844.",
+      url: "https://doi.org/10.5665/sleep.4716"
+    },
+    {
+      id: "WHO2020",
+      cite: "WHO (2020)",
+      text: "Bull, F. C., Al-Ansari, S. S., Biddle, S., et al. / World Health Organization. (2020). World Health Organization 2020 guidelines on physical activity and sedentary behaviour. British Journal of Sports Medicine, 54(24), 1451–1462.",
+      url: "https://doi.org/10.1136/bjsports-2020-102955"
+    },
+    {
+      id: "Russell1980",
+      cite: "Russell (1980)",
+      text: "Russell, J. A. (1980). A circumplex model of affect. Journal of Personality and Social Psychology, 39(6), 1161–1178.",
+      url: "https://doi.org/10.1037/h0077714"
+    },
+    {
+      id: "Edvardsen2023",
+      cite: "WHO / Maslach & Leiter (2022)",
+      text: "Maslach, C., & Leiter, M. P. (2022). The Burnout Challenge: Managing People's Relationships with Their Jobs. Harvard University Press.",
+      url: "https://www.hup.harvard.edu/books/9780674251014"
+    }
+  ];
+
+  /* ==================== DEFAULT DATA BUILDERS ==================== */
+  function createEmptyUserData() {
+    const days = [];
+    for (let i = 1; i <= 30; i++) {
+      days.push({
+        day: i,
+        mood: "",
+        energy: "",
+        sleep: "",
+        trigger: "",
+        screenBreak: "",
+        lightMove: "",
+        reflection3: "",
+        water: "",
+        notes: ""
+      });
+    }
+    return {
+      startDate: "",
+      days,
+      reflections: {
+        w1q1: "", w1q2: "",
+        w2q1: "", w2q2: "",
+        w3q1: "", w3q2: "",
+        w4q1: "", w4q2: ""
+      },
+      feedback: {
+        useful: "",
+        unclear: "",
+        features: "",
+        rating: "",
+        contact: ""
+      },
+      lastSynced: new Date().toISOString()
+    };
+  }
+
+  function createDemoUserData() {
+    const data = createEmptyUserData();
+    const today = new Date();
+    today.setDate(today.getDate() - 13);
+    data.startDate = today.toISOString().slice(0, 10);
+
+    const sample = [
+      { m: 3, e: 2, s: 5.5, t: "Beban kerja/studi", sb: "Ya", lm: "Tidak", w: "Ya", r: "Tugas menumpuk. Saya jeda 10 menit. Besok bagi tugas lebih kecil.", n: "Mulai hari agak lelah" },
+      { m: 3, e: 3, s: 6.5, t: "Target/deadline", sb: "Ya", lm: "Ya", w: "Ya", r: "Deadline rapat. Jalan kaki sore membantu. Tidur lebih awal malam ini.", n: "Lebih terkendali" },
+      { m: 4, e: 4, s: 7.5, t: "Tidak ada pemicu besar", sb: "Ya", lm: "Ya", w: "Ya", r: "Tidur cukup terasa bedanya. Fokus pagi tinggi. Pertahankan jam tidur.", n: "Produktif & tenang" },
+      { m: 2, e: 2, s: 5.0, t: "Kurang tidur", sb: "Tidak", lm: "Tidak", w: "Tidak", r: "Begadang menyelesaikan laporan. Energi turun drastis jam 2 siang. Matikan layar jam 22.", n: "Kelelahan layar" },
+      { m: 3, e: 3, s: 7.0, t: "Paparan layar berlebih", sb: "Ya", lm: "Tidak", w: "Ya", r: "Banyak meeting online. Jeda layar 30 menit menenangkan mata. Minum air cukup.", n: "Recovery bertahap" },
+      { m: 4, e: 3, s: 7.0, t: "Tidak ada pemicu besar", sb: "Ya", lm: "Ya", w: "Ya", r: "Peregangan ringan di sela kerja. Pikiran lebih jernih. Lanjutkan ritme ini.", n: "Stabil" },
+      { m: 5, e: 4, s: 8.0, t: "Tidak ada pemicu besar", sb: "Ya", lm: "Ya", w: "Ya", r: "Akhir pekan tanpa beban berlebih. Tidur 8 jam memulihkan mood. Refleksi minggu 1 selesai.", n: "Sangat segar" },
+      { m: 3, e: 3, s: 6.5, t: "Beban kerja/studi", sb: "Ya", lm: "Tidak", w: "Ya", r: "Senin padat. Tetap ambil napas sadar 5 menit. Prioritaskan 3 hal utama.", n: "Fokus terarah" },
+      { m: 2, e: 2, s: 5.5, t: "Konflik/komunikasi", sb: "Tidak", lm: "Tidak", w: "Ya", r: "Ada miskomunikasi tim. Emosi sempat naik. Besok klarifikasi dengan tenang.", n: "Butuh ruang jeda" },
+      { m: 3, e: 3, s: 7.0, t: "Target/deadline", sb: "Ya", lm: "Ya", w: "Ya", r: "Diskusi selesai baik. Olahraga ringan 15 menit. Tidur lebih nyenyak.", n: "Membaik" },
+      { m: 4, e: 4, s: 7.5, t: "Tidak ada pemicu besar", sb: "Ya", lm: "Ya", w: "Ya", r: "Ritme kerja seimbang. Tidak mengecek chat kerja malam hari. Energi terjaga.", n: "Seimbang" },
+      { m: 4, e: 5, s: 8.0, t: "Tidak ada pemicu besar", sb: "Ya", lm: "Ya", w: "Ya", r: "Tidur konsisten 2 hari berturut. Mood positif sepanjang hari. Catat hal yang bekerja baik.", n: "Puncak energi" },
+      { m: 3, e: 4, s: 6.5, t: "Paparan layar berlebih", sb: "Ya", lm: "Ya", w: "Tidak", r: "Lupa minum air saat fokus. Sedikit pusing sore. Taruh botol air di meja.", n: "Ingat hidrasi" },
+      { m: 4, e: 4, s: 7.5, t: "Tidak ada pemicu besar", sb: "Ya", lm: "Ya", w: "Ya", r: "Evaluasi 2 minggu sangat membantu melihat hubungan tidur dan mood. Lanjut ke minggu 3.", n: "Sadar pola" }
+    ];
+
+    sample.forEach((s, idx) => {
+      data.days[idx] = {
+        day: idx + 1,
+        mood: s.m,
+        energy: s.e,
+        sleep: s.s,
+        trigger: s.t,
+        screenBreak: s.sb,
+        lightMove: s.lm,
+        reflection3: s.r,
+        water: s.w,
+        notes: s.n
+      };
+    });
+
+    data.reflections.w1q1 = "Beban kerja/studi dan kurang tidur di awal minggu serta paparan layar yang panjang.";
+    data.reflections.w1q2 = "Jeda layar 30 menit dan tidur >= 7 jam secara konsisten menaikkan mood dari 2-3 menjadi 4-5.";
+    data.reflections.w2q1 = "Setiap kali tidur di bawah 6 jam, skor energi langsung turun ke 2. Tidur 7.5-8 jam menghasilkan energi 4-5.";
+    data.reflections.w2q2 = "Minum air cukup dan jeda layar 30 menit paling realistis dilakukan bahkan saat energi rendah.";
+    return data;
+  }
+
+  /* ==================== GLOBAL STORAGE & STATE ==================== */
+  const KEYS = {
+    ACCOUNTS: 'mbrt_accounts_v2',
+    SESSION: 'mbrt_active_session_v2',
+    SETTINGS: 'mbrt_settings_v2',
+    DATA_PREFIX: 'mbrt_userdata_v2_'
+  };
+
+  const state = {
+    accounts: [],
+    currentUser: null,
+    userData: createEmptyUserData(),
+    settings: {
+      theme: 'light',
+      lang: 'id',
+      autoSync: true,
+      googleClientId: '',
+      compact: false
+    },
+    tabs: [],
+    activeTabId: null,
+    history: [],
+    historyIdx: -1,
+    harianViewMode: 'table', // 'table' | 'focus'
+    harianFilter: 'all',     // 'all' | 'filled' | 'empty'
+    harianSearch: '',
+    focusDayIndex: 0
+  };
+
+  /* ==================== UTILITIES ==================== */
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function t(key) {
+    const lang = state.settings.lang || 'id';
+    return (I18N[lang] && I18N[lang][key]) || I18N.id[key] || key;
+  }
+
+  function L(idText, enText) {
+    return state.settings.lang === 'en' ? enText : idText;
+  }
+
+  function showToast(msg) {
+    const wrap = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transition = 'opacity 0.25s';
+      setTimeout(() => el.remove(), 260);
+    }, 2600);
+  }
+
+  function getFormattedDayDate(dayIndex) {
+    if (!state.userData.startDate) return '';
+    const parts = state.userData.startDate.split('-');
+    if (parts.length !== 3) return '';
+    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    if (isNaN(d.getTime())) return '';
+    d.setDate(d.getDate() + dayIndex);
+    const monthsId = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const mArr = state.settings.lang === 'en' ? monthsEn : monthsId;
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${dd} ${mArr[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  function computeAnalytics() {
+    const days = state.userData.days;
+    const moodVals = [];
+    const energyVals = [];
+    const sleepVals = [];
+    const sleepHighMoodVals = [];
+    let datedCount = 0;
+    let screenYes = 0;
+    let moveYes = 0;
+    let waterYes = 0;
+    const triggerCounts = {};
+
+    days.forEach((row, idx) => {
+      const hasDate = Boolean(getFormattedDayDate(idx));
+      if (hasDate) datedCount++;
+      const m = Number(row.mood);
+      const e = Number(row.energy);
+      const s = row.sleep !== '' && row.sleep !== null ? Number(row.sleep) : NaN;
+
+      if (m >= 1 && m <= 5) {
+        moodVals.push(m);
+        if (m >= 4 && !isNaN(s) && s > 0) sleepHighMoodVals.push(s);
+      }
+      if (e >= 1 && e <= 5) energyVals.push(e);
+      if (!isNaN(s) && s >= 0 && row.sleep !== '') sleepVals.push(s);
+
+      if (row.screenBreak === 'Ya') screenYes++;
+      if (row.lightMove === 'Ya') moveYes++;
+      if (row.water === 'Ya') waterYes++;
+      if (row.trigger) {
+        triggerCounts[row.trigger] = (triggerCounts[row.trigger] || 0) + 1;
+      }
+    });
+
+    const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length) : null;
+    const avgMood = avg(moodVals);
+    const avgEnergy = avg(energyVals);
+    const avgSleep = avg(sleepVals);
+    const avgSleepHighMood = avg(sleepHighMoodVals);
+
+    // Faithful to Excel formula: C11 / COUNTIF(Tanggal, "<>")
+    const denom = datedCount > 0 ? datedCount : 0;
+    const pct = count => denom > 0 ? Math.round((count / denom) * 100) : 0;
+
+    // Weekly breakdown
+    const weekAvg = (startDay, endDay) => {
+      const slice = days.slice(startDay - 1, endDay);
+      const ms = slice.map(r => Number(r.mood)).filter(v => v >= 1 && v <= 5);
+      const es = slice.map(r => Number(r.energy)).filter(v => v >= 1 && v <= 5);
+      const ss = slice.map(r => r.sleep !== '' ? Number(r.sleep) : NaN).filter(v => !isNaN(v));
+      return {
+        count: ms.length,
+        mood: avg(ms),
+        energy: avg(es),
+        sleep: avg(ss)
+      };
+    };
+
+    return {
+      avgMood,
+      avgEnergy,
+      avgSleep,
+      avgSleepHighMood,
+      moodCount: moodVals.length,
+      datedCount,
+      screenYes,
+      moveYes,
+      waterYes,
+      screenPct: pct(screenYes),
+      movePct: pct(moveYes),
+      waterPct: pct(waterYes),
+      triggerCounts,
+      weeks: [
+        weekAvg(1, 7),
+        weekAvg(8, 14),
+        weekAvg(15, 21),
+        weekAvg(22, 30)
+      ]
+    };
+  }
+
+  /* ==================== PERSISTENCE ==================== */
+  function loadInitialStorage() {
+    try {
+      const savedSettings = localStorage.getItem(KEYS.SETTINGS);
+      if (savedSettings) state.settings = { ...state.settings, ...JSON.parse(savedSettings) };
+      const savedAccounts = localStorage.getItem(KEYS.ACCOUNTS);
+      if (savedAccounts) state.accounts = JSON.parse(savedAccounts);
+      const activeEmail = localStorage.getItem(KEYS.SESSION);
+      if (activeEmail) {
+        const found = state.accounts.find(a => a.email === activeEmail);
+        if (found) {
+          state.currentUser = found;
+          loadUserData(found.email);
+        }
+      }
+    } catch (err) {
+      console.warn('Storage read fallback:', err);
+    }
+    applyThemeAndLangToDom();
+  }
+
+  function saveSettings() {
+    try {
+      localStorage.setItem(KEYS.SETTINGS, JSON.stringify(state.settings));
+    } catch (e) {}
+    applyThemeAndLangToDom();
+  }
+
+  function saveAccounts() {
+    try {
+      localStorage.setItem(KEYS.ACCOUNTS, JSON.stringify(state.accounts));
+    } catch (e) {}
+  }
+
+  function loadUserData(email) {
+    try {
+      const raw = localStorage.getItem(KEYS.DATA_PREFIX + email);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const base = createEmptyUserData();
+        state.userData = {
+          ...base,
+          ...parsed,
+          reflections: { ...base.reflections, ...(parsed.reflections || {}) },
+          feedback: { ...base.feedback, ...(parsed.feedback || {}) }
+        };
+        if (!Array.isArray(state.userData.days) || state.userData.days.length !== 30) {
+          state.userData.days = base.days;
+        }
+      } else {
+        state.userData = createEmptyUserData();
+      }
+    } catch (e) {
+      state.userData = createEmptyUserData();
+    }
+  }
+
+  function persistUserData(silent = true) {
+    if (!state.currentUser) return;
+    const dot = document.getElementById('cloudDot');
+    const txt = document.getElementById('cloudStatusText');
+    if (dot && txt) {
+      dot.style.background = 'var(--warning)';
+      txt.textContent = t('syncing');
+    }
+    state.userData.lastSynced = new Date().toISOString();
+    try {
+      localStorage.setItem(KEYS.DATA_PREFIX + state.currentUser.email, JSON.stringify(state.userData));
+    } catch (e) {
+      showToast('Storage quota warning');
+    }
+    setTimeout(() => {
+      if (dot && txt) {
+        dot.style.background = 'var(--success)';
+        txt.textContent = t('synced');
+      }
+    }, 260);
+    if (!silent) showToast(t('save_ok'));
+  }
+
+  function applyThemeAndLangToDom() {
+    document.documentElement.setAttribute('data-theme', state.settings.theme);
+    document.documentElement.setAttribute('lang', state.settings.lang);
+    const tBtn = document.getElementById('toolbarThemeBtn');
+    const lBtn = document.getElementById('toolbarLangBtn');
+    const loginT = document.getElementById('loginThemeBtn');
+    const loginL = document.getElementById('loginLangBtn');
+    if (tBtn) tBtn.textContent = state.settings.theme === 'dark' ? '☀️' : '🌙';
+    if (lBtn) lBtn.textContent = '🌐 ' + state.settings.lang.toUpperCase();
+    if (loginT) loginT.textContent = state.settings.theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+    if (loginL) loginL.textContent = '🌐 ' + state.settings.lang.toUpperCase();
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      el.textContent = t(key);
+    });
+  }
+
+  /* ==================== AUTHENTICATION & LOGIN ==================== */
+  function renderSavedAccounts() {
+    const container = document.getElementById('savedAccountsList');
+    if (!container) return;
+    if (!state.accounts.length) {
+      container.innerHTML = '';
+      return;
+    }
+    container.innerHTML = state.accounts.map(acc => `
+      <button class="account-chip" onclick="App.loginExisting('${escapeHtml(acc.email)}')">
+        <div class="avatar-circle" style="background:${escapeHtml(acc.color || '#1a73e8')}">${escapeHtml(acc.name.charAt(0).toUpperCase())}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13.5px;">${escapeHtml(acc.name)}</div>
+          <div style="font-size:12px;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;">${escapeHtml(acc.email)} • ☁️ Google Cloud</div>
+        </div>
+        <span style="font-size:12px;color:var(--accent);font-weight:600;">${L('Masuk →', 'Sign in →')}</span>
+      </button>
+    `).join('');
+  }
+
+  function completeLogin(account, isDemo = false) {
+    if (!state.accounts.some(a => a.email === account.email)) {
+      state.accounts.push(account);
+      saveAccounts();
+    }
+    state.currentUser = account;
+    localStorage.setItem(KEYS.SESSION, account.email);
+
+    const existingRaw = localStorage.getItem(KEYS.DATA_PREFIX + account.email);
+    if (!existingRaw && isDemo) {
+      state.userData = createDemoUserData();
+      persistUserData(true);
+    } else {
+      loadUserData(account.email);
+    }
+
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('chromeShell').style.display = 'flex';
+    document.getElementById('toolbarAvatar').textContent = account.name.charAt(0).toUpperCase();
+    document.getElementById('toolbarAvatar').style.background = account.color || '#1a73e8';
+
+    // Initialize Chrome tabs
+    state.tabs = [];
+    state.history = [];
+    state.historyIdx = -1;
+    openTab('dashboard');
+    showToast(L(`Selamat datang, ${account.name}! Sinkronisasi Google Cloud aktif.`, `Welcome, ${account.name}! Google Cloud Sync active.`));
+  }
+
+  function openGoogleAccountModal() {
+    openModal(`
+      <div style="display:flex;align-items:center;gap:10px;">
+        <svg width="24" height="24" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        <h3 style="font-size:17px;">${L('Hubungkan Akun Google Cloud', 'Connect Google Cloud Account')}</h3>
+      </div>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">
+        ${L('Masukkan nama dan alamat Gmail Anda untuk membuat ruang kerja awan pribadi yang terisolasi.', 'Enter your name and Gmail address to create an isolated personal cloud workspace.')}
+      </p>
+      <div>
+        <label style="font-size:12px;font-weight:600;">${L('Nama Lengkap', 'Full Name')}</label>
+        <input id="gNameInput" class="form-input" style="margin-top:4px;" placeholder="Contoh: Raka Pratama" />
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;">Email Google</label>
+        <input id="gEmailInput" type="email" class="form-input" style="margin-top:4px;" placeholder="nama@gmail.com" />
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
+        <button class="btn btn-outline" onclick="App.closeModal()">${L('Batal', 'Cancel')}</button>
+        <button class="btn btn-primary" onclick="App.submitGoogleModal()">${L('Lanjutkan ke Workspace', 'Continue to Workspace')}</button>
+      </div>
+    `);
+  }
+
+  /* ==================== CHROME TAB ENGINE ==================== */
+  function getRouteMeta(routeId) {
+    if (routeId === 'newtab') {
+      return { id: 'newtab', icon: '➕', url: 'chrome://newtab', i18nKey: 'tab_newtab' };
+    }
+    return ROUTES.find(r => r.id === routeId) || ROUTES[0];
+  }
+
+  function openTab(routeId, pushHistory = true) {
+    const meta = getRouteMeta(routeId);
+    let existing = state.tabs.find(tb => tb.routeId === routeId);
+    if (!existing) {
+      existing = {
+        uid: 'tab_' + routeId + '_' + Date.now(),
+        routeId: meta.id,
+        icon: meta.icon,
+        url: meta.url,
+        i18nKey: meta.i18nKey
+      };
+      state.tabs.push(existing);
+    }
+    activateTab(existing.uid, pushHistory);
+  }
+
+  function activateTab(uid, pushHistory = true) {
+    const tab = state.tabs.find(tb => tb.uid === uid);
+    if (!tab) return;
+    state.activeTabId = uid;
+
+    if (pushHistory) {
+      if (state.history[state.historyIdx] !== tab.routeId) {
+        state.history = state.history.slice(0, state.historyIdx + 1);
+        state.history.push(tab.routeId);
+        state.historyIdx = state.history.length - 1;
+      }
+    }
+
+    renderChromeBar();
+    renderActiveViewport();
+  }
+
+  function closeTab(uid, event) {
+    if (event) event.stopPropagation();
+    const idx = state.tabs.findIndex(tb => tb.uid === uid);
+    if (idx === -1) return;
+    const wasActive = state.activeTabId === uid;
+    state.tabs.splice(idx, 1);
+
+    if (state.tabs.length === 0) {
+      openTab('newtab');
+      return;
+    }
+    if (wasActive) {
+      const next = state.tabs[Math.min(idx, state.tabs.length - 1)];
+      activateTab(next.uid, true);
+    } else {
+      renderChromeBar();
+    }
+  }
+
+  function renderChromeBar() {
+    const tabsEl = document.getElementById('tabsContainer');
+    const bookmarksEl = document.getElementById('bookmarksBar');
+    const activeTab = state.tabs.find(tb => tb.uid === state.activeTabId);
+
+    tabsEl.innerHTML = state.tabs.map(tb => `
+      <div class="chrome-tab ${tb.uid === state.activeTabId ? 'active' : ''}" onclick="App.activateTab('${tb.uid}')">
+        <span class="chrome-tab-icon">${tb.icon}</span>
+        <span class="chrome-tab-title">${escapeHtml(t(tb.i18nKey))}</span>
+        <button class="chrome-tab-close" onclick="App.closeTab('${tb.uid}', event)" title="Close tab">×</button>
+      </div>
+    `).join('');
+
+    bookmarksEl.innerHTML = ROUTES.map(r => `
+      <button class="bookmark-item ${activeTab && activeTab.routeId === r.id ? 'active-menu' : ''}" onclick="App.openTab('${r.id}')">
+        <span>${r.icon}</span>
+        <span>${escapeHtml(t(r.i18nKey))}</span>
+      </button>
+    `).join('');
+
+    const omnibox = document.getElementById('omniboxInput');
+    if (omnibox && activeTab) {
+      omnibox.value = activeTab.url;
+    }
+
+    document.getElementById('btnBack').disabled = state.historyIdx <= 0;
+    document.getElementById('btnForward').disabled = state.historyIdx >= state.history.length - 1;
+  }
+
+  /* ==================== PAGE RENDERERS ==================== */
+  function renderActiveViewport() {
+    const vp = document.getElementById('browserViewport');
+    const activeTab = state.tabs.find(tb => tb.uid === state.activeTabId);
+    if (!activeTab) return;
+
+    let html = '';
+    switch (activeTab.routeId) {
+      case 'newtab': html = renderNewTabPage(); break;
+      case 'dashboard': html = renderDashboardPage(); break;
+      case 'panduan': html = renderPanduanPage(); break;
+      case 'harian': html = renderHarianPage(); break;
+      case 'hasil': html = renderHasilPage(); break;
+      case 'ilmiah': html = renderIlmiahPage(); break;
+      case 'refleksi': html = renderRefleksiPage(); break;
+      case 'akun': html = renderAkunPage(); break;
+      case 'pengaturan': html = renderPengaturanPage(); break;
+      default: html = renderDashboardPage();
+    }
+    vp.innerHTML = `<div class="page-container">${html}</div>`;
+    if (activeTab.routeId === 'hasil' || activeTab.routeId === 'ilmiah') {
+      bindChartTooltips();
+    }
+  }
+
+  function renderNewTabPage() {
+    const stats = computeAnalytics();
+    return `
+      <div class="hero-banner">
+        <div>
+          <h2>🌐 ${L('Chrome Workspace — Peluncur Menu', 'Chrome Workspace — Menu Launcher')}</h2>
+          <p>${L('Pilih tab menu di bawah ini untuk membuka jendela baru di atas, atau gunakan bilah bookmark di atas.', 'Choose any menu tile below to open a top browser tab, or use the bookmarks bar above.')}</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <span class="badge badge-info" style="font-size:12px;padding:6px 12px;">📅 ${stats.moodCount}/30 ${L('Hari Tercatat', 'Days Logged')}</span>
+          <span class="badge badge-success" style="font-size:12px;padding:6px 12px;">☁️ ${escapeHtml(state.currentUser.email)}</span>
+        </div>
+      </div>
+
+      <div class="ntp-grid">
+        ${ROUTES.map(r => `
+          <button class="ntp-tile" onclick="App.openTab('${r.id}')">
+            <div class="ntp-icon">${r.icon}</div>
+            <div style="font-weight:700;font-size:15px;">${escapeHtml(t(r.i18nKey))}</div>
+            <div style="font-size:12px;color:var(--text-secondary);">${escapeHtml(r.url)}</div>
+          </button>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  function renderDashboardPage() {
+    const stats = computeAnalytics();
+    return `
+      <div class="hero-banner">
+        <div>
+          <h2>🏠 ${L('Dashboard Utama: Memahami Mood, Burnout & Pemantauan Diri', 'Main Dashboard: Understanding Mood, Burnout & Self-Monitoring')}</h2>
+          <p>${L('Selamat datang di pusat kendali 30-Day Mood & Burnout Reset Tracker. Ringkasan progres Anda dipadukan dengan literatur psikologi berbasis bukti ilmiah agar Anda dapat memvalidasi setiap informasi.', 'Welcome to the 30-Day Mood & Burnout Reset Tracker control center. Your progress summary is paired with evidence-based psychology literature so every insight can be validated.')}</p>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="App.openTab('harian')">📝 ${L('Isi Catatan Hari Ini', 'Log Today')}</button>
+          <button class="btn btn-soft" onclick="App.openTab('ilmiah')">🔬 ${L('Lihat Analisis Ilmiah', 'View Scientific Analysis')}</button>
+        </div>
+      </div>
+
+      <!-- Quick KPI Strip -->
+      <div class="grid-5">
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Hari Tercatat', 'Days Logged')}</div>
+          <div class="kpi-value">${stats.moodCount} <span style="font-size:14px;color:var(--text-secondary);">/ 30</span></div>
+          <div class="kpi-sub">${L('Target siklus 30 hari', '30-day cycle')}</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Rata-rata Mood', 'Average Mood')}</div>
+          <div class="kpi-value">${stats.avgMood !== null ? stats.avgMood.toFixed(1) : '—'}</div>
+          <div class="kpi-sub">${L('Skala ordinal 1–5', 'Ordinal scale 1–5')}</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Rata-rata Energi', 'Average Energy')}</div>
+          <div class="kpi-value">${stats.avgEnergy !== null ? stats.avgEnergy.toFixed(1) : '—'}</div>
+          <div class="kpi-sub">${L('Skala ordinal 1–5', 'Ordinal scale 1–5')}</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Rata-rata Tidur', 'Average Sleep')}</div>
+          <div class="kpi-value">${stats.avgSleep !== null ? stats.avgSleep.toFixed(1) + 'j' : '—'}</div>
+          <div class="kpi-sub">${L('Rekomendasi: 7–9 jam', 'Rec: 7–9 hrs')}</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Tidur saat Mood ≥ 4', 'Sleep when Mood ≥ 4')}</div>
+          <div class="kpi-value">${stats.avgSleepHighMood !== null ? stats.avgSleepHighMood.toFixed(1) + 'j' : '—'}</div>
+          <div class="kpi-sub">${L('Korelasi pemulihan', 'Recovery pattern')}</div>
+        </div>
+      </div>
+
+      <!-- Scientific Knowledge Cards -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎭 ${L('Apa itu Suasana Hati (Mood) & Energi?', 'What are Mood & Energy?')}</div>
+            <span class="cite-tag">Russell (1980) • Likert (1932)</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);margin-bottom:10px;">
+            ${L(
+              'Dalam psikologi afektif, suasana hati (mood) bersifat lebih difus dan bertahan lebih lama dibanding emosi sesaat, serta dipetakan melalui dua dimensi utama: <strong>valensi</strong> (menyenangkan vs tidak menyenangkan) dan <strong>aktivasi/energi</strong> (berenergi tinggi vs terkuras) <span class="cite-tag">Russell, 1980</span>.',
+              'In affective psychology, mood is a diffuse, longer-lasting affective state mapped along two core dimensions: <strong>valence</strong> (pleasant vs. unpleasant) and <strong>arousal/energy</strong> (activated vs. depleted) <span class="cite-tag">Russell, 1980</span>.'
+            )}
+          </p>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);">
+            ${L(
+              'Tracker ini menggunakan format penilaian bertingkat 1–5 yang terinspirasi metode skala respons bertingkat <span class="cite-tag">Likert, 1932</span> sebagai pencatatan subjektif harian—bukan alat tes terstandar.',
+              'This tracker adopts a 1–5 graded response format inspired by <span class="cite-tag">Likert (1932)</span> as a daily subjective log—not a standardized psychometric test.'
+            )}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🔥 ${L('Apa itu Burnout? (Definisi Ilmiah & WHO)', 'What is Burnout? (Scientific & WHO Definition)')}</div>
+            <span class="cite-tag">Maslach &amp; Jackson (1981) • WHO (2019)</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);margin-bottom:10px;">
+            ${L(
+              'Dalam klasifikasi <strong>ICD-11</strong>, Organisasi Kesehatan Dunia mendefinisikan <em>burnout</em> sebagai <strong>fenomena terkait pekerjaan</strong> (bukan kondisi medis) akibat stres kerja kronis yang belum berhasil dikelola <span class="cite-tag">WHO, 2019</span>.',
+              'In <strong>ICD-11</strong>, the World Health Organization classifies <em>burnout</em> as an <strong>occupational phenomenon</strong> (not a medical condition) resulting from chronic workplace stress that has not been successfully managed <span class="cite-tag">WHO, 2019</span>.'
+            )}
+          </p>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);">
+            ${L(
+              'Secara konseptual, burnout mencakup tiga dimensi klasik: kelelahan emosional (<em>emotional exhaustion</em>), depersonalisasi/jarak mental, dan penurunan rasa pencapaian pribadi <span class="cite-tag">Maslach &amp; Jackson, 1981</span>, serta diperluas oleh <em>Burnout Assessment Tool</em> (BAT) mencakup kelelahan inti dan gangguan regulasi kognitif-emosional <span class="cite-tag">Schaufeli, Desart, &amp; De Witte, 2020</span>.',
+              'Conceptually, burnout involves emotional exhaustion, depersonalization/mental distance, and reduced personal accomplishment <span class="cite-tag">Maslach &amp; Jackson, 1981</span>, expanded in the Burnout Assessment Tool (BAT) to core exhaustion and cognitive/emotional impairment <span class="cite-tag">Schaufeli, Desart, &amp; De Witte, 2020</span>.'
+            )}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">😴 ${L('Mengapa Durasi Tidur & Kebiasaan Mikro Penting?', 'Why Do Sleep Duration & Micro-Habits Matter?')}</div>
+            <span class="cite-tag">Hirshkowitz et al. (2015) • WHO (2020)</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);margin-bottom:10px;">
+            ${L(
+              'Konsensus <em>National Sleep Foundation</em> dan AASM/SRS merekomendasikan <strong>7–9 jam tidur per malam</strong> bagi orang dewasa untuk menjaga pemulihan kognitif dan kestabilan emosi <span class="cite-tag">Hirshkowitz et al., 2015</span> <span class="cite-tag">Watson et al., 2015</span>.',
+              'The <em>National Sleep Foundation</em> and AASM/SRS consensus recommend <strong>7–9 hours of sleep per night</strong> for adults to support cognitive recovery and emotional regulation <span class="cite-tag">Hirshkowitz et al., 2015</span> <span class="cite-tag">Watson et al., 2015</span>.'
+            )}
+          </p>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);">
+            ${L(
+              'Sementara itu, membatasi perilaku sedentari melalui gerak tubuh ringan secara rutin terbukti mendukung kesehatan mental dan vitalitas harian <span class="cite-tag">WHO, 2020</span>.',
+              'Meanwhile, interrupting sedentary periods with regular light physical movement supports mental well-being and daily vitality <span class="cite-tag">WHO, 2020</span>.'
+            )}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📈 ${L('Efektivitas Pemantauan Diri (Self-Monitoring)', 'Effectiveness of Self-Monitoring')}</div>
+            <span class="cite-tag">Harkin et al. (2016)</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);margin-bottom:10px;">
+            ${L(
+              'Meta-analisis eksperimental terhadap 138 studi oleh <span class="cite-tag">Harkin et al. (2016)</span> menemukan bahwa memantau kemajuan secara sadar dan mencatatnya secara fisik/digital memiliki efek signifikan dalam meningkatkan pencapaian tujuan perubahan perilaku.',
+              'An experimental meta-analysis of 138 studies by <span class="cite-tag">Harkin et al. (2016)</span> demonstrated that actively monitoring progress and recording it enhances goal attainment and behavioral awareness.'
+            )}
+          </p>
+          <div class="callout warn" style="margin-top:8px;">
+            ${L(
+              '<strong>Batasan Etis:</strong> Mencatat data membantu kesadaran pola, tetapi hasil tiap individu berbeda dan tidak menggantikan konsultasi psikolog atau dokter bila muncul keluhan menetap.',
+              '<strong>Ethical Boundary:</strong> Logging patterns builds awareness, but individual outcomes vary and do not replace professional clinical care if distress persists.'
+            )}
+          </div>
+        </div>
+      </div>
+
+      <!-- Reference Validation Quick Panel -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📚 ${L('Validasi Referensi Ilmiah Utama', 'Primary Scientific References Validation')}</div>
+          <button class="btn btn-soft" onclick="App.openTab('panduan')">${L('Lihat Panduan Lengkap →', 'Open Full Guide →')}</button>
+        </div>
+        <div class="grid-2">
+          ${REFERENCES.slice(0, 6).map(ref => `
+            <div class="ref-item">
+              <span class="cite-tag">${escapeHtml(ref.cite)}</span><br/>
+              ${escapeHtml(ref.text)}<br/>
+              <a href="${escapeHtml(ref.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(ref.url)}</a>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderPanduanPage() {
+    const fb = state.userData.feedback;
+    const steps = state.settings.lang === 'en' ? [
+      ["1. Cloud Account Setup", "Sign in with Google Cloud so your 30-day log is isolated and synced automatically. You can export to Excel (.xls/.csv) anytime."],
+      ["2. Set Start Date", "Open the Daily Log (Catatan Harian) tab and set Day 1 Start Date. Days 2–30 auto-populate in DD MMM YYYY format."],
+      ["3. Fill Daily Entry (2–3 mins)", "Every evening, record Mood (1–5), Energy (1–5), Sleep Hours, Main Trigger, Habits (Yes/No), 3-Sentence Reflection, and Brief Notes honestly."],
+      ["4. Use Scales Consistently", "Score 1 is not failure and score 5 is not a mandatory target. Pick the number closest to your lived experience."],
+      ["5. Check Dashboard & Charts", "Results & Charts summarize your entries dynamically. Empty days remain blank and are never treated as zero."],
+      ["6. Weekly Reflections", "Complete the Weekly Reflection tab at the end of days 7, 14, 21, and 30 without self-judgment."],
+      ["7. Protect Privacy", "Keep your personal workspace private and sign out if using a shared device."]
+    ] : [
+      ["1. Akun & Salinan Pribadi", "Masuk dengan profil Google Cloud Anda agar data 30 hari terisolasi dan tersinkron otomatis. Anda dapat mengekspor ke Excel (.xls/.csv) kapan saja."],
+      ["2. Tentukan Tanggal Mulai", "Di tab Catatan Harian, isi tanggal mulai pada Hari ke-1. Tanggal hari ke-2 hingga ke-30 akan terisi otomatis (format DD MMM YYYY)."],
+      ["3. Isi Catatan Harian (2–3 menit)", "Setiap malam, isi mood, energi, jam tidur, pemicu utama, kebiasaan (Ya/Tidak), refleksi 3 kalimat, dan catatan singkat sesuai pengalaman nyata Anda."],
+      ["4. Gunakan Skala Secara Konsisten", "Pilih angka 1–5 yang paling mendekati kondisi hari itu. Skor 1 bukan berarti gagal dan skor 5 bukan target wajib."],
+      ["5. Periksa Hasil & Grafik", "Tab Hasil & Grafik merangkum data Anda secara otomatis. Hari tanpa input tetap kosong dan tidak dihitung sebagai nol."],
+      ["6. Lakukan Refleksi Mingguan", "Isi tab Refleksi Mingguan pada akhir hari ke-7, 14, 21, dan 30 untuk mengenali pola tanpa menyalahkan diri sendiri."],
+      ["7. Jaga Privasi", "Simpan ekspor data di akun Google Drive pribadi dan keluar dari akun jika memakai perangkat bersama."]
+    ];
+
+    const scales = [
+      [1, L("Sangat buruk / sangat berat", "Very poor / very heavy"), L("Sangat terkuras / sangat lelah", "Severely depleted / exhausted")],
+      [2, L("Kurang baik", "Below average / low"), L("Rendah / mudah lelah", "Low / easily fatigued")],
+      [3, L("Netral / biasa saja", "Neutral / ordinary"), L("Sedang / cukup", "Moderate / sufficient")],
+      [4, L("Cukup baik", "Pretty good"), L("Cukup berenergi", "Fairly energized")],
+      [5, L("Sangat baik / positif", "Very good / positive"), L("Sangat berenergi / segar", "Highly energized / refreshed")]
+    ];
+
+    return `
+      <div class="hero-banner">
+        <div>
+          <h2>📘 ${L('Sheet 1: Mulai & Panduan Penggunaan', 'Sheet 1: Start & Usage Guide')}</h2>
+          <p>${L('Panduan lengkap penggunaan 30-Day Mood & Burnout Reset Tracker, skala penilaian 1–5, contoh pengisian, dan daftar referensi ilmiah.', 'Complete guide for the 30-Day Mood & Burnout Reset Tracker, 1–5 rating scale, illustration example, and scientific reference list.')}</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🧭 ${L('A. Cara Menggunakan Tracker (7 Langkah)', 'A. How to Use the Tracker (7 Steps)')}</div>
+        </div>
+        <div class="grid-2">
+          ${steps.map(([title, desc]) => `
+            <div class="kpi-box">
+              <div style="font-weight:700;font-size:14px;color:var(--navy-mid);">${escapeHtml(title)}</div>
+              <div style="font-size:13px;line-height:1.55;color:var(--text-secondary);">${escapeHtml(desc)}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📏 ${L('B. Memahami Skor 1–5: Format Penilaian Bertingkat', 'B. Understanding the 1–5 Graded Scale')}</div>
+          <span class="cite-tag">Likert (1932)</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;line-height:1.55;">
+          ${L('Format respons bertingkat ini merujuk pada pendekatan skala penilaian Rensis Likert (1932) sebagai alat pencatatan subjektif harian, bukan instrumen psikologi terstandar. Skor bersifat ordinal (menunjukkan urutan kategori).', 'This graded response format draws on Rensis Likert (1932) as a daily subjective logging tool, not a standardized clinical instrument. Scores are ordinal.')}
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>${L('Skor', 'Score')}</th>
+                <th>Mood</th>
+                <th>${L('Energi', 'Energy')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${scales.map(([num, m, e]) => `
+                <tr>
+                  <td><strong>${num}</strong></td>
+                  <td>${escapeHtml(m)}</td>
+                  <td>${escapeHtml(e)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💡 ${L('D. Contoh Pengisian (Ilustrasi)', 'D. Example Entry (Illustration Only)')}</div>
+        </div>
+        <div class="callout warn">
+          ${L(
+            '<strong>CONTOH:</strong> Mood = 3, Energi = 2, Tidur = 5,5 jam, Pemicu = Beban kerja/studi, Jeda layar = Ya, Gerak tubuh = Tidak, Refleksi = “Hari ini tugas menumpuk; saya beristirahat 10 menit; besok saya akan membagi tugas.” Contoh ini hanya menunjukkan cara mengisi.',
+            '<strong>EXAMPLE:</strong> Mood = 3, Energy = 2, Sleep = 5.5 hrs, Trigger = Workload/study, Screen break = Yes, Light movement = No, Reflection = “Tasks piled up today; I rested 10 minutes; tomorrow I will break tasks down.” Illustration only.'
+          )}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💬 ${L('E. Kolom Saran & Masukan untuk Pengembang', 'E. Developer Feedback Form')}</div>
+          <span class="badge badge-info">${L('Tersimpan di Akun Anda', 'Saved in Your Account')}</span>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label style="font-size:12.5px;font-weight:600;">${L('Bagian mana yang paling bermanfaat?', 'Which part is most helpful?')}</label>
+            <input class="form-input" style="margin-top:4px;" value="${escapeHtml(fb.useful)}" onchange="App.updateFeedback('useful', this.value)" />
+          </div>
+          <div>
+            <label style="font-size:12.5px;font-weight:600;">${L('Bagian mana yang kurang jelas / menyulitkan?', 'Which part is unclear or difficult?')}</label>
+            <input class="form-input" style="margin-top:4px;" value="${escapeHtml(fb.unclear)}" onchange="App.updateFeedback('unclear', this.value)" />
+          </div>
+          <div>
+            <label style="font-size:12.5px;font-weight:600;">${L('Fitur, kebiasaan, atau metrik tambahan?', 'Features, habits, or metrics to add?')}</label>
+            <input class="form-input" style="margin-top:4px;" value="${escapeHtml(fb.features)}" onchange="App.updateFeedback('features', this.value)" />
+          </div>
+          <div>
+            <label style="font-size:12.5px;font-weight:600;">${L('Penilaian keseluruhan (1–5)', 'Overall rating (1–5)')}</label>
+            <select class="form-select" style="margin-top:4px;" onchange="App.updateFeedback('rating', this.value)">
+              <option value="">${t('unset')}</option>
+              ${[1,2,3,4,5].map(n => `<option value="${n}" ${String(fb.rating) === String(n) ? 'selected' : ''}>${n} ★</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📚 ${L('F. Referensi Ilmiah Lengkap', 'F. Complete Scientific References')}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          ${REFERENCES.map(r => `
+            <div class="ref-item">
+              <strong>[${escapeHtml(r.cite)}]</strong> ${escapeHtml(r.text)} — <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.url)}</a>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderHarianPage() {
+    const triggers = state.settings.lang === 'en' ? TRIGGERS_EN : TRIGGERS_ID;
+    const filteredDays = state.userData.days.filter(d => {
+      const isFilled = d.mood !== '' || d.energy !== '' || d.sleep !== '' || d.reflection3 !== '' || d.notes !== '';
+      if (state.harianFilter === 'filled' && !isFilled) return false;
+      if (state.harianFilter === 'empty' && isFilled) return false;
+      if (state.harianSearch) {
+        const q = state.harianSearch.toLowerCase();
+        const hay = `${d.day} ${d.trigger} ${d.reflection3} ${d.notes}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
+    const focusRow = state.userData.days[state.focusDayIndex] || state.userData.days[0];
+    const focusDate = getFormattedDayDate(focusRow.day - 1) || L('(Tanggal belum diatur)', '(Date not set)');
+
+    return `
+      <div class="hero-banner">
+        <div>
+          <h2>📝 ${L('Sheet 2: Catatan Harian • 30 Hari', 'Sheet 2: Daily Log • 30 Days')}</h2>
+          <p>${L('Atur tanggal mulai pada Hari ke-1, maka tanggal hingga Hari ke-30 terhitung otomatis. Semua perubahan tersimpan real-time.', 'Set the Start Date on Day 1 and Days 2–30 auto-calculate. All changes save in real time.')}</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-soft" onclick="App.exportExcelXls()">📥 ${L('Unduh Excel (.xls)', 'Download Excel (.xls)')}</button>
+          <button class="btn btn-soft" onclick="App.exportCSV()">📄 ${L('Unduh CSV', 'Download CSV')}</button>
+        </div>
+      </div>
+
+      <!-- Controls Bar -->
+      <div class="card">
+        <div style="display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:14px;">
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:end;">
+            <div>
+              <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">📅 ${L('Tanggal Mulai (Hari 1 / Sel B3)', 'Start Date (Day 1 / Cell B3)')}</label>
+              <input type="date" class="form-input" style="width:170px;" value="${escapeHtml(state.userData.startDate)}" onchange="App.setStartDate(this.value)" />
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">🔍 ${L('Cari Catatan / Pemicu', 'Search Notes / Triggers')}</label>
+              <input type="text" class="form-input" style="width:200px;" placeholder="${L('Ketik kata kunci...', 'Type keyword...')}" value="${escapeHtml(state.harianSearch)}" oninput="App.setHarianSearch(this.value)" />
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;display:block;margin-bottom:4px;">🗂️ Filter</label>
+              <select class="form-select" style="width:150px;" onchange="App.setHarianFilter(this.value)">
+                <option value="all" ${state.harianFilter === 'all' ? 'selected' : ''}>${L('Semua (30 Hari)', 'All (30 Days)')}</option>
+                <option value="filled" ${state.harianFilter === 'filled' ? 'selected' : ''}>${L('Sudah Diisi', 'Filled Only')}</option>
+                <option value="empty" ${state.harianFilter === 'empty' ? 'selected' : ''}>${L('Belum Diisi', 'Empty Only')}</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn ${state.harianViewMode === 'table' ? 'btn-primary' : 'btn-outline'}" onclick="App.setHarianView('table')">📋 ${L('Mode Tabel Excel', 'Excel Table Mode')}</button>
+            <button class="btn ${state.harianViewMode === 'focus' ? 'btn-primary' : 'btn-outline'}" onclick="App.setHarianView('focus')">🎯 ${L('Mode Fokus Harian', 'Daily Focus Mode')}</button>
+            <button class="btn btn-soft" onclick="App.loadSampleIntoCurrent()">✨ ${L('Isi Contoh 14 Hari', 'Load 14-Day Sample')}</button>
+            <button class="btn btn-danger" onclick="App.confirmResetAll()">🗑️ ${L('Reset', 'Reset')}</button>
+          </div>
+        </div>
+      </div>
+
+      ${state.harianViewMode === 'focus' ? `
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎯 ${L('Pengisian Fokus: Hari ke-', 'Focus Entry: Day ')}${focusRow.day} • <span style="color:var(--accent);">${escapeHtml(focusDate)}</span></div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button class="btn btn-outline" onclick="App.stepFocusDay(-1)">← ${L('Sebelumnya', 'Prev')}</button>
+              <select class="form-select" style="width:120px;" onchange="App.jumpFocusDay(this.value)">
+                ${state.userData.days.map((d, i) => `<option value="${i}" ${i === state.focusDayIndex ? 'selected' : ''}>${L('Hari', 'Day')} ${d.day}</option>`).join('')}
+              </select>
+              <button class="btn btn-outline" onclick="App.stepFocusDay(1)">${L('Berikutnya', 'Next')} →</button>
+            </div>
+          </div>
+
+          <div class="grid-3" style="margin-bottom:14px;">
+            <div class="kpi-box">
+              <div class="kpi-label">Mood (1–5)</div>
+              <div class="score-pills" style="margin-top:6px;">
+                ${[1,2,3,4,5].map(n => `<button class="score-pill ${Number(focusRow.mood) === n ? 'selected' : ''}" onclick="App.updateDayField(${focusRow.day - 1}, 'mood', ${Number(focusRow.mood) === n ? "''" : n}, true)">${n}</button>`).join('')}
+              </div>
+            </div>
+            <div class="kpi-box">
+              <div class="kpi-label">${L('Energi (1–5)', 'Energy (1–5)')}</div>
+              <div class="score-pills" style="margin-top:6px;">
+                ${[1,2,3,4,5].map(n => `<button class="score-pill ${Number(focusRow.energy) === n ? 'selected' : ''}" onclick="App.updateDayField(${focusRow.day - 1}, 'energy', ${Number(focusRow.energy) === n ? "''" : n}, true)">${n}</button>`).join('')}
+              </div>
+            </div>
+            <div class="kpi-box">
+              <div class="kpi-label">${L('Jam Tidur (contoh: 7.5)', 'Sleep Hours (e.g. 7.5)')}</div>
+              <input type="number" step="0.5" min="0" max="24" class="form-input" style="margin-top:4px;" value="${escapeHtml(focusRow.sleep)}" onchange="App.updateDayField(${focusRow.day - 1}, 'sleep', this.value, true)" />
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom:14px;">
+            <div>
+              <label style="font-size:12.5px;font-weight:700;">${L('Pemicu Utama', 'Main Trigger')}</label>
+              <select class="form-select" style="margin-top:4px;" onchange="App.updateDayField(${focusRow.day - 1}, 'trigger', this.value, true)">
+                <option value="">${t('unset')}</option>
+                ${triggers.map(tr => `<option value="${escapeHtml(tr)}" ${focusRow.trigger === tr ? 'selected' : ''}>${escapeHtml(tr)}</option>`).join('')}
+              </select>
+            </div>
+            <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:11.5px;font-weight:700;margin-bottom:4px;">${L('Jeda Layar 30m', '30m Screen Break')}</div>
+                <button class="habit-toggle ${focusRow.screenBreak === 'Ya' ? 'yes' : focusRow.screenBreak === 'Tidak' ? 'no' : ''}" onclick="App.cycleHabit(${focusRow.day - 1}, 'screenBreak', true)">${focusRow.screenBreak ? (focusRow.screenBreak === 'Ya' ? t('yes') : t('no')) : '—'}</button>
+              </div>
+              <div>
+                <div style="font-size:11.5px;font-weight:700;margin-bottom:4px;">${L('Gerak Tubuh Ringan', 'Light Movement')}</div>
+                <button class="habit-toggle ${focusRow.lightMove === 'Ya' ? 'yes' : focusRow.lightMove === 'Tidak' ? 'no' : ''}" onclick="App.cycleHabit(${focusRow.day - 1}, 'lightMove', true)">${focusRow.lightMove ? (focusRow.lightMove === 'Ya' ? t('yes') : t('no')) : '—'}</button>
+              </div>
+              <div>
+                <div style="font-size:11.5px;font-weight:700;margin-bottom:4px;">${L('Minum Air Cukup', 'Enough Water')}</div>
+                <button class="habit-toggle ${focusRow.water === 'Ya' ? 'yes' : focusRow.water === 'Tidak' ? 'no' : ''}" onclick="App.cycleHabit(${focusRow.day - 1}, 'water', true)">${focusRow.water ? (focusRow.water === 'Ya' ? t('yes') : t('no')) : '—'}</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div>
+              <label style="font-size:12.5px;font-weight:700;">${L('Refleksi 3 Kalimat (teks)', '3-Sentence Reflection (text)')}</label>
+              <textarea rows="3" class="form-textarea" style="margin-top:4px;" onchange="App.updateDayField(${focusRow.day - 1}, 'reflection3', this.value, false)">${escapeHtml(focusRow.reflection3)}</textarea>
+            </div>
+            <div>
+              <label style="font-size:12.5px;font-weight:700;">${L('Catatan Singkat', 'Brief Notes')}</label>
+              <textarea rows="3" class="form-textarea" style="margin-top:4px;" onchange="App.updateDayField(${focusRow.day - 1}, 'notes', this.value, false)">${escapeHtml(focusRow.notes)}</textarea>
+            </div>
+          </div>
+        </div>
+      ` : `
+        <div class="card" style="padding:0;overflow:hidden;">
+          <div class="table-wrap" style="max-height:62vh;">
+            <table>
+              <thead>
+                <tr>
+                  <th>${L('Hari', 'Day')}</th>
+                  <th>${L('Tanggal', 'Date')}</th>
+                  <th>Mood (1–5)</th>
+                  <th>${L('Energi (1–5)', 'Energy (1–5)')}</th>
+                  <th>${L('Jam Tidur', 'Sleep (hrs)')}</th>
+                  <th>${L('Pemicu Utama', 'Main Trigger')}</th>
+                  <th>${L('Jeda Layar 30m', '30m Screen Break')}</th>
+                  <th>${L('Gerak Ringan', 'Light Move')}</th>
+                  <th>${L('Refleksi 3 Kalimat', '3-Sentence Reflection')}</th>
+                  <th>${L('Minum Air', 'Water')}</th>
+                  <th>${L('Catatan Singkat', 'Brief Notes')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${filteredDays.map(row => {
+                  const idx = row.day - 1;
+                  const fDate = getFormattedDayDate(idx) || '—';
+                  return `
+                    <tr>
+                      <td><strong>${row.day}</strong></td>
+                      <td style="white-space:nowrap;font-size:12px;color:var(--text-secondary);">${escapeHtml(fDate)}</td>
+                      <td>
+                        <div class="score-pills">
+                          ${[1,2,3,4,5].map(n => `<button class="score-pill ${Number(row.mood) === n ? 'selected' : ''}" onclick="App.updateDayField(${idx}, 'mood', ${Number(row.mood) === n ? "''" : n}, true)">${n}</button>`).join('')}
+                        </div>
+                      </td>
+                      <td>
+                        <div class="score-pills">
+                          ${[1,2,3,4,5].map(n => `<button class="score-pill ${Number(row.energy) === n ? 'selected' : ''}" onclick="App.updateDayField(${idx}, 'energy', ${Number(row.energy) === n ? "''" : n}, true)">${n}</button>`).join('')}
+                        </div>
+                      </td>
+                      <td>
+                        <input type="number" step="0.5" min="0" max="24" class="form-input cell-input" value="${escapeHtml(row.sleep)}" placeholder="7.0" onchange="App.updateDayField(${idx}, 'sleep', this.value, false)" />
+                      </td>
+                      <td>
+                        <select class="form-select cell-input" style="min-width:155px;" onchange="App.updateDayField(${idx}, 'trigger', this.value, false)">
+                          <option value="">${t('unset')}</option>
+                          ${triggers.map(tr => `<option value="${escapeHtml(tr)}" ${row.trigger === tr ? 'selected' : ''}>${escapeHtml(tr)}</option>`).join('')}
+                          ${row.trigger && !triggers.includes(row.trigger) ? `<option value="${escapeHtml(row.trigger)}" selected>${escapeHtml(row.trigger)}</option>` : ''}
+                        </select>
+                      </td>
+                      <td>
+                        <button class="habit-toggle ${row.screenBreak === 'Ya' ? 'yes' : row.screenBreak === 'Tidak' ? 'no' : ''}" onclick="App.cycleHabit(${idx}, 'screenBreak', true)">${row.screenBreak ? (row.screenBreak === 'Ya' ? t('yes') : t('no')) : '—'}</button>
+                      </td>
+                      <td>
+                        <button class="habit-toggle ${row.lightMove === 'Ya' ? 'yes' : row.lightMove === 'Tidak' ? 'no' : ''}" onclick="App.cycleHabit(${idx}, 'lightMove', true)">${row.lightMove ? (row.lightMove === 'Ya' ? t('yes') : t('no')) : '—'}</button>
+                      </td>
+                      <td>
+                        <input type="text" class="form-input cell-input" style="min-width:210px;" value="${escapeHtml(row.reflection3)}" placeholder="${L('Tulis 3 kalimat...', 'Write 3 sentences...')}" onchange="App.updateDayField(${idx}, 'reflection3', this.value, false)" />
+                      </td>
+                      <td>
+                        <button class="habit-toggle ${row.water === 'Ya' ? 'yes' : row.water === 'Tidak' ? 'no' : ''}" onclick="App.cycleHabit(${idx}, 'water', true)">${row.water ? (row.water === 'Ya' ? t('yes') : t('no')) : '—'}</button>
+                      </td>
+                      <td>
+                        <input type="text" class="form-input cell-input" style="min-width:160px;" value="${escapeHtml(row.notes)}" placeholder="${L('Catatan...', 'Notes...')}" onchange="App.updateDayField(${idx}, 'notes', this.value, false)" />
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `}
+    `;
+  }
+
+  function buildLineChartSVG() {
+    const W = 880, H = 290;
+    const padL = 46, padR = 24, padT = 24, padB = 38;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+    const days = state.userData.days;
+
+    const xFor = i => padL + (i / 29) * plotW;
+    const yFor = val => padT + ((5 - val) / 4) * plotH;
+
+    let gridLines = '';
+    for (let v = 1; v <= 5; v++) {
+      const y = yFor(v);
+      gridLines += `
+        <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="var(--border-light)" stroke-dasharray="4 4" />
+        <text x="${padL - 10}" y="${y + 4}" text-anchor="end" font-size="11" fill="var(--text-secondary)">${v}</text>
+      `;
+    }
+
+    let xLabels = '';
+    for (let i = 0; i < 30; i++) {
+      if (i === 0 || (i + 1) % 5 === 0) {
+        xLabels += `<text x="${xFor(i)}" y="${H - 12}" text-anchor="middle" font-size="11" fill="var(--text-secondary)">H${i + 1}</text>`;
+      }
+    }
+
+    const buildPath = key => {
+      let dStr = '';
+      let drawing = false;
+      days.forEach((row, i) => {
+        const val = Number(row[key]);
+        if (val >= 1 && val <= 5) {
+          const x = xFor(i).toFixed(1);
+          const y = yFor(val).toFixed(1);
+          dStr += (drawing ? ` L ${x} ${y}` : `M ${x} ${y}`);
+          drawing = true;
+        } else {
+          drawing = false;
+        }
+      });
+      return dStr;
+    };
+
+    const moodPath = buildPath('mood');
+    const energyPath = buildPath('energy');
+
+    let pointsSvg = '';
+    days.forEach((row, i) => {
+      const x = xFor(i).toFixed(1);
+      const m = Number(row.mood);
+      const e = Number(row.energy);
+      const dt = getFormattedDayDate(i) || `Hari ${row.day}`;
+      if (m >= 1 && m <= 5) {
+        pointsSvg += `<circle class="chart-pt" cx="${x}" cy="${yFor(m).toFixed(1)}" r="4.5" fill="#1a73e8" stroke="#fff" stroke-width="1.5" data-tip="Hari ${row.day} (${escapeHtml(dt)}) • Mood: ${m}/5" />`;
+      }
+      if (e >= 1 && e <= 5) {
+        pointsSvg += `<circle class="chart-pt" cx="${x}" cy="${yFor(e).toFixed(1)}" r="4.5" fill="#0f6b78" stroke="#fff" stroke-width="1.5" data-tip="Hari ${row.day} (${escapeHtml(dt)}) • Energi: ${e}/5" />`;
+      }
+    });
+
+    return `
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;min-width:620px;height:auto;display:block;">
+        ${gridLines}
+        ${xLabels}
+        ${moodPath ? `<path d="${moodPath}" fill="none" stroke="#1a73e8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />` : ''}
+        ${energyPath ? `<path d="${energyPath}" fill="none" stroke="#0f6b78" stroke-width="2.6" stroke-dasharray="6 3" stroke-linecap="round" stroke-linejoin="round" />` : ''}
+        ${pointsSvg}
+      </svg>
+    `;
+  }
+
+  function bindChartTooltips() {
+    const tip = document.getElementById('chartTooltip');
+    document.querySelectorAll('.chart-pt').forEach(el => {
+      el.addEventListener('mouseenter', e => {
+        tip.textContent = el.getAttribute('data-tip');
+        tip.style.display = 'block';
+      });
+      el.addEventListener('mousemove', e => {
+        tip.style.left = (e.clientX + 12) + 'px';
+        tip.style.top = (e.clientY - 28) + 'px';
+      });
+      el.addEventListener('mouseleave', () => {
+        tip.style.display = 'none';
+      });
+    });
+  }
+
+  function renderHasilPage() {
+    const stats = computeAnalytics();
+    const triggerEntries = Object.entries(stats.triggerCounts).sort((a, b) => b[1] - a[1]);
+
+    return `
+      <div class="hero-banner">
+        <div>
+          <h2>📊 ${L('Sheet 3: Hasil & Grafik • Ringkasan 30 Hari', 'Sheet 3: Results & Charts • 30-Day Summary')}</h2>
+          <p>${L('Perhitungan otomatis dari tab Catatan Harian menggunakan formula identik dengan workbook Excel.', 'Automatic calculations from the Daily Log tab matching the Excel workbook formulas.')}</p>
+        </div>
+        <button class="btn btn-primary" onclick="App.openTab('ilmiah')">🔬 ${L('Baca Penjelasan Ilmiah Hasil Ini →', 'Read Scientific Explanation →')}</button>
+      </div>
+
+      <!-- Top 5 KPIs -->
+      <div class="grid-5">
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Rata-rata Mood', 'Average Mood')}</div>
+          <div class="kpi-value">${stats.avgMood !== null ? stats.avgMood.toFixed(1) : '—'}</div>
+          <div class="kpi-sub">AVERAGE(Mood)</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Rata-rata Energi', 'Average Energy')}</div>
+          <div class="kpi-value">${stats.avgEnergy !== null ? stats.avgEnergy.toFixed(1) : '—'}</div>
+          <div class="kpi-sub">AVERAGE(Energi)</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Rata-rata Jam Tidur', 'Average Sleep Hours')}</div>
+          <div class="kpi-value">${stats.avgSleep !== null ? stats.avgSleep.toFixed(1) : '—'}</div>
+          <div class="kpi-sub">AVERAGE(Tidur)</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Tidur saat Mood ≥ 4', 'Sleep when Mood ≥ 4')}</div>
+          <div class="kpi-value">${stats.avgSleepHighMood !== null ? stats.avgSleepHighMood.toFixed(1) : '—'}</div>
+          <div class="kpi-sub">AVERAGEIF(Mood≥4)</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">${L('Hari dg Catatan Mood', 'Days with Mood Log')}</div>
+          <div class="kpi-value">${stats.moodCount}</div>
+          <div class="kpi-sub">COUNT(Mood)</div>
+        </div>
+      </div>
+
+      <!-- Habits & Triggers -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">✅ ${L('Persentase Kebiasaan Tercapai', 'Habit Achievement Percentage')}</div>
+            <span class="badge badge-info">${stats.datedCount} ${L('hari bertanggal', 'dated days')}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;">
+                <span>📵 ${L('Jeda Layar 30 Menit', '30-Min Screen Break')} (${stats.screenYes} ${L('hari', 'days')})</span>
+                <span>${stats.screenPct}%</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:${stats.screenPct}%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;">
+                <span>🏃 ${L('Gerak Tubuh Ringan', 'Light Physical Movement')} (${stats.moveYes} ${L('hari', 'days')})</span>
+                <span>${stats.movePct}%</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:${stats.movePct}%;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px;">
+                <span>💧 ${L('Minum Air Cukup', 'Enough Water')} (${stats.waterYes} ${L('hari', 'days')})</span>
+                <span>${stats.waterPct}%</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:${stats.waterPct}%;"></div></div>
+            </div>
+          </div>
+          <div class="callout warn" style="margin-top:14px;font-size:12px;">
+            ${L(
+              'Catatan interpretasi: Persentase dihitung dari hari yang memiliki tanggal terisi. Jika persentase 0%, pastikan Tanggal Mulai sudah diisi di tab Catatan Harian.',
+              'Interpretation note: Percentages are calculated over days with a filled date. If 0%, ensure Start Date is set in Daily Log.'
+            )}
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚡ ${L('Distribusi Pemicu Utama', 'Main Trigger Distribution')}</div>
+          </div>
+          ${triggerEntries.length === 0 ? `
+            <p style="font-size:13px;color:var(--text-secondary);">${L('Belum ada pemicu yang dicatat.', 'No triggers logged yet.')}</p>
+          ` : `
+            <div style="display:flex;flex-direction:column;gap:9px;">
+              ${triggerEntries.map(([name, cnt]) => {
+                const maxCnt = triggerEntries[0][1];
+                const wPct = Math.round((cnt / maxCnt) * 100);
+                return `
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:3px;">
+                      <span>${escapeHtml(name)}</span>
+                      <span>${cnt}×</span>
+                    </div>
+                    <div class="progress-track" style="height:8px;"><div class="progress-fill" style="width:${wPct}%;"></div></div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `}
+        </div>
+      </div>
+
+      <!-- 30-Day Trend Line Chart -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📈 ${L('Pergerakan Mood & Energi (Skala 1–5) — 30 Hari', 'Mood & Energy Trend (Scale 1–5) — 30 Days')}</div>
+          <div style="display:flex;gap:14px;font-size:12px;font-weight:700;">
+            <span style="color:#1a73e8;">● Mood (${L('Garis Solid', 'Solid')})</span>
+            <span style="color:#0f6b78;">● ${L('Energi (Garis Putus)', 'Energy (Dashed)')}</span>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          ${buildLineChartSVG()}
+        </div>
+        <div class="callout" style="margin-top:10px;font-size:12.5px;">
+          ${L('Grafik menampilkan skor yang tersedia. Hari tanpa input tetap kosong dan tidak boleh ditafsirkan sebagai skor nol.', 'Chart displays available scores only. Unfilled days remain blank and must not be interpreted as zero.')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderIlmiahPage() {
+    const stats = computeAnalytics();
+    const hasData = stats.moodCount > 0;
+
+    // Personalized non-diagnostic evidence-informed readings
+    let moodReading = L('Belum ada data mood yang cukup untuk dianalisis.', 'Not enough mood data recorded yet.');
+    if (stats.avgMood !== null) {
+      if (stats.avgMood >= 3.8) {
+        moodReading = L(
+          `Rata-rata mood Anda sebesar <strong>${stats.avgMood.toFixed(1)}/5</strong> berada di kategori cenderung positif. Dalam model sirkumpleks afek <span class="cite-tag">Russell, 1980</span>, kondisi ini mencerminkan keseimbangan valensi positif yang mendukung fleksibilitas kognitif.`,
+          `Your average mood of <strong>${stats.avgMood.toFixed(1)}/5</strong> falls in a generally positive range. Within the circumplex model of affect <span class="cite-tag">Russell, 1980</span>, this reflects positive affective valence that supports cognitive flexibility.`
+        );
+      } else if (stats.avgMood >= 2.8) {
+        moodReading = L(
+          `Rata-rata mood Anda sebesar <strong>${stats.avgMood.toFixed(1)}/5</strong> berada di zona netral-fluktuatif. Fluktuasi wajar terjadi mengikuti beban tuntutan harian; perhatikan hari-hari saat skor turun ke ≤2 untuk melihat pemicunya.`,
+          `Your average mood of <strong>${stats.avgMood.toFixed(1)}/5</strong> lies in a neutral-fluctuating zone. Daily variation is normal; inspect days dipping to ≤2 to identify contextual triggers.`
+        );
+      } else {
+        moodReading = L(
+          `Rata-rata mood Anda sebesar <strong>${stats.avgMood.toFixed(1)}/5</strong> menunjukkan kecenderungan afek berat selama periode tercatat. Gunakan refleksi mingguan untuk mengevaluasi beban tuntutan <span class="cite-tag">Maslach &amp; Leiter, 2022</span>, dan pertimbangkan dukungan profesional bila kondisi menetap.`,
+          `Your average mood of <strong>${stats.avgMood.toFixed(1)}/5</strong> indicates heavier affective strain across logged days. Review workload demands in weekly reflection <span class="cite-tag">Maslach &amp; Leiter, 2022</span>, and consider professional support if persistent.`
+        );
+      }
+    }
+
+    let sleepReading = L('Belum ada catatan jam tidur.', 'No sleep hours logged yet.');
+    if (stats.avgSleep !== null) {
+      if (stats.avgSleep >= 7 && stats.avgSleep <= 9) {
+        sleepReading = L(
+          `Rata-rata durasi tidur Anda <strong>${stats.avgSleep.toFixed(1)} jam/malam</strong> sesuai rentang rekomendasi konsensus dewasa (7–9 jam) oleh <span class="cite-tag">Hirshkowitz et al., 2015</span> dan <span class="cite-tag">Watson et al., 2015</span>.`,
+          `Your average sleep duration of <strong>${stats.avgSleep.toFixed(1)} hrs/night</strong> aligns with the 7–9 hour adult consensus guideline by <span class="cite-tag">Hirshkowitz et al., 2015</span> and <span class="cite-tag">Watson et al., 2015</span>.`
+        );
+      } else if (stats.avgSleep < 7) {
+        sleepReading = L(
+          `Rata-rata durasi tidur Anda <strong>${stats.avgSleep.toFixed(1)} jam/malam</strong> berada di bawah ambang rekomendasi 7–9 jam <span class="cite-tag">Watson et al., 2015</span>. Kurang tidur kronis berhubungan erat dengan penurunan regulasi emosi dan peningkatan kelelahan subjektif.`,
+          `Your average sleep of <strong>${stats.avgSleep.toFixed(1)} hrs/night</strong> is below the 7–9 hour adult recommendation <span class="cite-tag">Watson et al., 2015</span>. Chronic short sleep is strongly linked to reduced emotional regulation and heightened fatigue.`
+        );
+      } else {
+        sleepReading = L(
+          `Rata-rata durasi tidur Anda <strong>${stats.avgSleep.toFixed(1)} jam/malam</strong> melebihi 9 jam. Tidur panjang sesekali dapat mencerminkan pemulihan dari utang tidur, namun jika disertai lelah berkepanjangan, perhatikan kualitas pemulihan Anda <span class="cite-tag">Hirshkowitz et al., 2015</span>.`,
+          `Your average sleep of <strong>${stats.avgSleep.toFixed(1)} hrs/night</strong> exceeds 9 hours. Occasional longer sleep may reflect recovery from sleep debt; if paired with persistent fatigue, review sleep quality <span class="cite-tag">Hirshkowitz et al., 2015</span>.`
+        );
+      }
+    }
+
+    return `
+      <div class="hero-banner">
+        <div>
+          <h2>🔬 ${L('Hasil & Penjelasan Berbasis Ilmiah', 'Scientifically Grounded Results & Explanation')}</h2>
+          <p>${L('Integrasi data pribadi Anda dengan kerangka penelitian psikologi & kesehatan terkini beserta sitasi Penulis (Tahun) yang dapat divalidasi langsung.', 'Integration of your personal log with up-to-date psychological and health research frameworks with verifiable Author (Year) citations.')}</p>
+        </div>
+        <span class="badge badge-info" style="font-size:12px;padding:7px 12px;">${L('Status: Non-Diagnostik / Edukatif', 'Status: Non-Diagnostic / Educational')}</span>
+      </div>
+
+      ${!hasData ? `
+        <div class="callout warn">
+          ${L('Anda belum memiliki catatan harian. Isi minimal 1 hari di tab Catatan Harian atau muat data contoh agar interpretasi personal muncul.', 'You have no daily logs yet. Log at least 1 day or load sample data to generate personalized interpretation.')}
+        </div>
+      ` : ''}
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">1. ${L('Analisis Afek (Mood) & Energi', 'Affect (Mood) & Energy Analysis')}</div>
+            <span class="cite-tag">Russell (1980) • Likert (1932)</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);margin-bottom:10px;">${moodReading}</p>
+          <p style="font-size:13px;line-height:1.6;color:var(--text-secondary);">
+            ${L(
+              `Rata-rata energi Anda saat ini: <strong>${stats.avgEnergy !== null ? stats.avgEnergy.toFixed(1) : '—'}/5</strong>. Ingat bahwa skor 1–5 bersifat <em>ordinal</em> <span class="cite-tag">Likert, 1932</span>, sehingga nilai rata-rata dipakai sebagai ringkasan praktis kecenderungan, bukan skor klinis.`,
+              `Your current average energy: <strong>${stats.avgEnergy !== null ? stats.avgEnergy.toFixed(1) : '—'}/5</strong>. Remember 1–5 scores are <em>ordinal</em> <span class="cite-tag">Likert, 1932</span>; averages serve as practical trend summaries, not clinical metrics.`
+            )}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">2. ${L('Konteks Kelelahan & Risiko Burnout', 'Exhaustion & Burnout Context')}</div>
+            <span class="cite-tag">Maslach &amp; Jackson (1981) • Schaufeli et al. (2020) • WHO (2019)</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);margin-bottom:10px;">
+            ${L(
+              'Penurunan energi berulang yang disertai pemicu beban kerja/studi berkaitan dengan dimensi inti <em>exhaustion</em> pada literatur burnout <span class="cite-tag">Maslach &amp; Jackson, 1981</span> dan <em>Burnout Assessment Tool</em> <span class="cite-tag">Schaufeli, Desart, &amp; De Witte, 2020</span>.',
+              'Repeated low-energy days linked to workload/study triggers relate to the core <em>exhaustion</em> dimension in burnout research <span class="cite-tag">Maslach &amp; Jackson, 1981</span> and the <em>Burnout Assessment Tool</em> <span class="cite-tag">Schaufeli, Desart, &amp; De Witte, 2020</span>.'
+            )}
+          </p>
+          <p style="font-size:13px;line-height:1.6;color:var(--text-secondary);">
+            ${L(
+              'Sesuai <span class="cite-tag">WHO (2019)</span>, burnout merupakan fenomena terkait konteks pekerjaan (ICD-11) dan pemulihannya efektif bila dibarengi penyesuaian tuntutan serta jeda pemulihan, bukan hanya usaha individual semata <span class="cite-tag">Maslach &amp; Leiter, 2022</span>.',
+              'Per <span class="cite-tag">WHO (2019)</span>, burnout is an occupational phenomenon (ICD-11) best addressed by adjusting systemic/routine demands alongside personal recovery <span class="cite-tag">Maslach &amp; Leiter, 2022</span>.'
+            )}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">3. ${L('Hubungan Tidur dengan Kestabilan Mood', 'Sleep Duration & Mood Stability')}</div>
+            <span class="cite-tag">Hirshkowitz et al. (2015) • Watson et al. (2015)</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);margin-bottom:10px;">${sleepReading}</p>
+          <p style="font-size:13px;line-height:1.6;color:var(--text-secondary);">
+            ${stats.avgSleepHighMood !== null ? L(
+              `Pada data Anda, rata-rata tidur pada hari dengan <strong>Mood ≥ 4</strong> adalah <strong>${stats.avgSleepHighMood.toFixed(1)} jam</strong>. Membandingkan angka ini dengan rata-rata tidur keseluruhan membantu Anda menemukan ambang tidur pemulihan pribadi.`,
+              `In your log, average sleep on days with <strong>Mood ≥ 4</strong> is <strong>${stats.avgSleepHighMood.toFixed(1)} hrs</strong>. Comparing this against overall average sleep helps identify your personal recovery sleep threshold.`
+            ) : L('Catat hari dengan Mood ≥ 4 dan jam tidur untuk melihat pola tidur pemulihan Anda.', 'Log days with Mood ≥ 4 and sleep hours to uncover your recovery sleep threshold.')}
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">4. ${L('Peran Kebiasaan Mikro & Pemantauan Diri', 'Role of Micro-Habits & Self-Monitoring')}</div>
+            <span class="cite-tag">Harkin et al. (2016) • WHO (2020)</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.65;color:var(--text-secondary);margin-bottom:10px;">
+            ${L(
+              `Capaian kebiasaan Anda saat ini: Jeda Layar <strong>${stats.screenPct}%</strong>, Gerak Tubuh Ringan <strong>${stats.movePct}%</strong>, Minum Air Cukup <strong>${stats.waterPct}%</strong>.`,
+              `Your current habit adherence: Screen Break <strong>${stats.screenPct}%</strong>, Light Movement <strong>${stats.movePct}%</strong>, Hydration <strong>${stats.waterPct}%</strong>.`
+            )}
+          </p>
+          <p style="font-size:13px;line-height:1.6;color:var(--text-secondary);">
+            ${L(
+              'Aktivitas fisik ringan untuk memutus duduk berkepanjangan direkomendasikan oleh <span class="cite-tag">WHO (2020)</span>, dan pencatatan rutin terbukti membantu regulasi tujuan perilaku menurut meta-analisis <span class="cite-tag">Harkin et al. (2016)</span>.',
+              'Light movement to break up sedentary time is recommended by <span class="cite-tag">WHO (2020)</span>, and consistent progress monitoring strengthens behavioral goal attainment per <span class="cite-tag">Harkin et al. (2016)</span>.'
+            )}
+          </p>
+        </div>
+      </div>
+
+      <!-- Weekly Progression Comparison Table -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📆 ${L('Ringkasan Tren Per Minggu (Minggu 1–4)', 'Weekly Trend Progression (Weeks 1–4)')}</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>${L('Periode', 'Period')}</th>
+                <th>${L('Hari Tercatat', 'Days Logged')}</th>
+                <th>${L('Rata-rata Mood', 'Avg Mood')}</th>
+                <th>${L('Rata-rata Energi', 'Avg Energy')}</th>
+                <th>${L('Rata-rata Tidur (jam)', 'Avg Sleep (hrs)')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${stats.weeks.map((w, i) => `
+                <tr>
+                  <td><strong>${L('Minggu', 'Week')} ${i + 1}</strong> (${['1–7','8–14','15–21','22–30'][i]})</td>
+                  <td>${w.count}</td>
+                  <td>${w.mood !== null ? w.mood.toFixed(1) : '—'}</td>
+                  <td>${w.energy !== null ? w.energy.toFixed(1) : '—'}</td>
+                  <td>${w.sleep !== null ? w.sleep.toFixed(1) : '—'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Full Citations -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📖 ${L('Daftar Pustaka & Sitasi Terintegrasi', 'Integrated Scientific Bibliography')}</div>
+        </div>
+        <div class="grid-2">
+          ${REFERENCES.map(r => `
+            <div class="ref-item">
+              <span class="cite-tag">${escapeHtml(r.cite)}</span><br/>
+              ${escapeHtml(r.text)}<br/>
+              <a href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(r.url)}</a>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderRefleksiPage() {
+    const ref = state.userData.reflections;
+    const stats = computeAnalytics();
+    const weeks = [
+      {
+        title: L("MINGGU 1 • HARI 1–7", "WEEK 1 • DAYS 1–7"),
+        stat: stats.weeks[0],
+        q1Key: "w1q1", q1: L("Pemicu utama apa yang paling sering muncul minggu ini?", "What main triggers appeared most frequently this week?"),
+        q2Key: "w1q2", q2: L("Hal kecil apa yang membantu menjaga mood atau energi minggu ini?", "What small things helped maintain mood or energy this week?")
+      },
+      {
+        title: L("MINGGU 2 • HARI 8–14", "WEEK 2 • DAYS 8–14"),
+        stat: stats.weeks[1],
+        q1Key: "w2q1", q1: L("Bagaimana pola jam tidur berkaitan dengan skor energi minggu ini?", "How did sleep duration relate to your energy scores this week?"),
+        q2Key: "w2q2", q2: L("Kebiasaan mana yang paling realistis dilakukan saat energi rendah?", "Which habit was most realistic to maintain when energy was low?")
+      },
+      {
+        title: L("MINGGU 3 • HARI 15–21", "WEEK 3 • DAYS 15–21"),
+        stat: stats.weeks[2],
+        q1Key: "w3q1", q1: L("Tuntutan atau rutinitas apa yang perlu disesuaikan agar tidak kewalahan?", "Which demands or routines need adjustment to prevent overwhelm?"),
+        q2Key: "w3q2", q2: L("Kapan penurunan energi paling sering terjadi? Adakah pola waktu atau situasi?", "When did energy dips happen most often? Any time or situational pattern?")
+      },
+      {
+        title: L("MINGGU 4 • HARI 22–30", "WEEK 4 • DAYS 22–30"),
+        stat: stats.weeks[3],
+        q1Key: "w4q1", q1: L("Pola apa yang paling menonjol setelah 30 hari pencatatan?", "What pattern stands out most after 30 days of logging?"),
+        q2Key: "w4q2", q2: L("Langkah sederhana apa yang ingin dilanjutkan pada bulan berikutnya?", "What simple step do you want to carry forward into next month?")
+      }
+    ];
+
+    return `
+      <div class="hero-banner">
+        <div>
+          <h2>🪞 ${L('Sheet 4: Refleksi Mingguan • Jeda untuk Memahami Pola', 'Sheet 4: Weekly Reflection • Pause to Understand Patterns')}</h2>
+          <p>${L('Jawab dengan jujur dan tanpa menghakimi diri sendiri. Tidak ada jawaban benar atau salah.', 'Answer honestly and without self-judgment. There are no right or wrong answers.')}</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        ${weeks.map(w => `
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--teal);">${escapeHtml(w.title)}</div>
+              <span class="badge badge-info">
+                Mood: ${w.stat.mood !== null ? w.stat.mood.toFixed(1) : '—'} • ${L('Energi', 'Energy')}: ${w.stat.energy !== null ? w.stat.energy.toFixed(1) : '—'} • ${L('Tidur', 'Sleep')}: ${w.stat.sleep !== null ? w.stat.sleep.toFixed(1) : '—'}
+              </span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div>
+                <label style="font-size:13px;font-weight:700;display:block;margin-bottom:5px;">${escapeHtml(w.q1)}</label>
+                <textarea rows="3" class="form-textarea" placeholder="${L('Tulis refleksi Anda di sini...', 'Write your reflection here...')}" onchange="App.updateReflection('${w.q1Key}', this.value)">${escapeHtml(ref[w.q1Key])}</textarea>
+              </div>
+              <div>
+                <label style="font-size:13px;font-weight:700;display:block;margin-bottom:5px;">${escapeHtml(w.q2)}</label>
+                <textarea rows="3" class="form-textarea" placeholder="${L('Tulis refleksi Anda di sini...', 'Write your reflection here...')}" onchange="App.updateReflection('${w.q2Key}', this.value)">${escapeHtml(ref[w.q2Key])}</textarea>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="callout success">
+        <strong>${L('PENUTUP REFLEKSI:', 'REFLECTION CLOSING:')}</strong>
+        ${L(
+          'Pilih satu langkah kecil yang realistis. Perubahan tidak harus sempurna atau linear. Jika catatan menunjukkan kesulitan yang menetap atau mengganggu aktivitas sehari-hari, pertimbangkan mencari dukungan profesional.',
+          'Pick one small realistic step. Change does not have to be perfect or linear. If your logs reflect persistent distress interfering with daily life, consider reaching out to a qualified professional.'
+        )}
+      </div>
+    `;
+  }
+
+  function renderAkunPage() {
+    const u = state.currentUser;
+    const stats = computeAnalytics();
+    return `
+      <div class="hero-banner">
+        <div>
+          <h2>👤 ${L('Akun Google & Sinkronisasi Awan', 'Google Account & Cloud Sync')}</h2>
+          <p>${L('Kelola profil Google Cloud Anda, cadangkan data ke JSON / Excel, atau pulihkan cadangan dari perangkat lain.', 'Manage your Google Cloud profile, back up to JSON / Excel, or restore backups from another device.')}</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">☁️ ${L('Profil Google Aktif', 'Active Google Profile')}</div>
+            <span class="badge badge-success">${L('Terhubung', 'Connected')}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+            <div class="avatar-circle" style="width:54px;height:54px;font-size:22px;background:${escapeHtml(u.color || '#1a73e8')}">${escapeHtml(u.name.charAt(0).toUpperCase())}</div>
+            <div>
+              <div style="font-size:17px;font-weight:700;">${escapeHtml(u.name)}</div>
+              <div style="font-size:13px;color:var(--text-secondary);">${escapeHtml(u.email)}</div>
+              <div style="font-size:11.5px;color:var(--text-secondary);margin-top:3px;">${L('Sinkron terakhir:', 'Last synced:')} ${escapeHtml(new Date(state.userData.lastSynced).toLocaleString())}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="App.manualSync()">🔄 ${L('Sinkronkan Sekarang', 'Sync Now')}</button>
+            <button class="btn btn-outline" onclick="App.logout()">🚪 ${L('Keluar / Ganti Akun', 'Sign Out / Switch Account')}</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">💾 ${L('Ekspor & Impor Data (Excel & Cloud Backup)', 'Export & Import Data (Excel & Cloud Backup)')}</div>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.55;">
+            ${L(`Data tercatat saat ini: ${stats.moodCount} hari mood, ${stats.datedCount} hari bertanggal. Unduh file untuk arsip Google Drive atau buka kembali di Microsoft Excel.`, `Currently logged: ${stats.moodCount} mood days, ${stats.datedCount} dated days. Download to archive in Google Drive or open in Microsoft Excel.`)}
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+            <button class="btn btn-teal" onclick="App.exportExcelXls()">📊 ${L('Ekspor Excel (.xls)', 'Export Excel (.xls)')}</button>
+            <button class="btn btn-soft" onclick="App.exportCSV()">📄 ${L('Ekspor CSV (.csv)', 'Export CSV (.csv)')}</button>
+            <button class="btn btn-soft" onclick="App.exportJSON()">📦 ${L('Cadangan JSON', 'JSON Backup')}</button>
+          </div>
+          <div>
+            <label style="font-size:12.5px;font-weight:700;display:block;margin-bottom:6px;">📥 ${L('Impor Cadangan JSON', 'Import JSON Backup')}</label>
+            <input type="file" accept=".json" class="form-input" onchange="App.importJSON(event)" />
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderPengaturanPage() {
+    const s = state.settings;
+    return `
+      <div class="hero-banner">
+        <div>
+          <h2>⚙️ ${L('Pengaturan Aplikasi & Preferensi', 'Application Settings & Preferences')}</h2>
+          <p>${L('Atur tampilan Mode Malam (Dark Mode), pilihan bahasa Indonesia / Inggris, dan preferensi sinkronisasi sesuka hati.', 'Customize Dark Mode, Indonesian / English language switching, and sync preferences freely.')}</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎨 ${L('Tampilan & Mode Malam', 'Appearance & Dark Mode')}</div>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">
+            ${L('Pilih tema antarmuka Chrome Workspace yang nyaman bagi mata Anda, terutama saat mengisi refleksi di malam hari.', 'Choose a comfortable Chrome Workspace theme, especially for evening logging.')}
+          </p>
+          <div style="display:flex;gap:10px;">
+            <button class="btn ${s.theme === 'light' ? 'btn-primary' : 'btn-outline'}" onclick="App.setTheme('light')">☀️ ${L('Mode Terang (Light)', 'Light Mode')}</button>
+            <button class="btn ${s.theme === 'dark' ? 'btn-primary' : 'btn-outline'}" onclick="App.setTheme('dark')">🌙 ${L('Mode Malam (Dark)', 'Dark Mode')}</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🌐 ${L('Bahasa Antarmuka (ID / EN)', 'Interface Language (ID / EN)')}</div>
+          </div>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">
+            ${L('Ubah seluruh menu, nama tab Chrome, panduan, label grafik, dan penjelasan ilmiah antara Bahasa Indonesia dan Bahasa Inggris.', 'Switch all menus, Chrome tabs, guides, chart labels, and scientific explanations between Indonesian and English.')}
+          </p>
+          <div style="display:flex;gap:10px;">
+            <button class="btn ${s.lang === 'id' ? 'btn-primary' : 'btn-outline'}" onclick="App.setLang('id')">🇮🇩 Bahasa Indonesia</button>
+            <button class="btn ${s.lang === 'en' ? 'btn-primary' : 'btn-outline'}" onclick="App.setLang('en')">🇬🇧 English</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">☁️ ${L('Konfigurasi Google OAuth Client ID (Opsional)', 'Google OAuth Client ID Config (Optional)')}</div>
+          </div>
+          <p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5;">
+            ${L('Jika Anda menghosting file ini di domain HTTPS dan ingin menghubungkan Google Identity Services nyata, masukkan Client ID Anda di sini.', 'If hosting this file on HTTPS and integrating live Google Identity Services, store your Client ID here.')}
+          </p>
+          <input class="form-input" placeholder="123456789-xxxx.apps.googleusercontent.com" value="${escapeHtml(s.googleClientId)}" onchange="App.setClientId(this.value)" />
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🧹 ${L('Manajemen Data Ruang Kerja', 'Workspace Data Management')}</div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-soft" onclick="App.loadSampleIntoCurrent()">✨ ${L('Muat Data Contoh 14 Hari', 'Load 14-Day Sample Data')}</button>
+            <button class="btn btn-danger" onclick="App.confirmResetAll()">🗑️ ${L('Kosongkan Semua Data Akun Ini', 'Clear All Data for This Account')}</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  /* ==================== EXPORTS (XLS / CSV / JSON) ==================== */
+  function downloadBlob(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function exportCSV() {
+    const headers = ['Hari','Tanggal','Mood (1-5)','Energi (1-5)','Jam Tidur','Pemicu Utama','Jeda Layar 30 Menit','Gerak Tubuh Ringan','Refleksi 3 Kalimat','Minum Air Cukup','Catatan Singkat'];
+    const escCsv = val => `"${String(val ?? '').replace(/"/g, '""')}"`;
+    const rows = state.userData.days.map((d, i) => [
+      d.day,
+      getFormattedDayDate(i),
+      d.mood,
+      d.energy,
+      d.sleep,
+      d.trigger,
+      d.screenBreak,
+      d.lightMove,
+      d.reflection3,
+      d.water,
+      d.notes
+    ].map(escCsv).join(','));
+    const csv = '\uFEFF' + [headers.map(escCsv).join(','), ...rows].join('\r\n');
+    downloadBlob(csv, '30-Day-Mood-Burnout-Tracker.csv', 'text/csv;charset=utf-8;');
+    showToast(L('File CSV berhasil diunduh.', 'CSV file downloaded.'));
+  }
+
+  function exportExcelXls() {
+    const stats = computeAnalytics();
+    const rowsHtml = state.userData.days.map((d, i) => `
+      <tr>
+        <td>${d.day}</td>
+        <td>${escapeHtml(getFormattedDayDate(i))}</td>
+        <td>${escapeHtml(d.mood)}</td>
+        <td>${escapeHtml(d.energy)}</td>
+        <td>${escapeHtml(d.sleep)}</td>
+        <td>${escapeHtml(d.trigger)}</td>
+        <td>${escapeHtml(d.screenBreak)}</td>
+        <td>${escapeHtml(d.lightMove)}</td>
+        <td>${escapeHtml(d.reflection3)}</td>
+        <td>${escapeHtml(d.water)}</td>
+        <td>${escapeHtml(d.notes)}</td>
+      </tr>
+    `).join('');
+
+    const html = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+      <head><meta charset="UTF-8"></head>
+      <body>
+        <h2>CATATAN HARIAN • 30 HARI</h2>
+        <p>Akun: ${escapeHtml(state.currentUser.email)} | Rata-rata Mood: ${stats.avgMood !== null ? stats.avgMood.toFixed(1) : '-'} | Rata-rata Energi: ${stats.avgEnergy !== null ? stats.avgEnergy.toFixed(1) : '-'} | Rata-rata Tidur: ${stats.avgSleep !== null ? stats.avgSleep.toFixed(1) : '-'}</p>
+        <table border="1">
+          <thead>
+            <tr style="background:#1F4E78;color:#FFFFFF;">
+              <th>Hari</th><th>Tanggal</th><th>Mood (1-5)</th><th>Energi (1-5)</th><th>Jam Tidur</th><th>Pemicu Utama</th><th>Jeda Layar 30 Menit</th><th>Gerak Tubuh Ringan</th><th>Refleksi 3 Kalimat</th><th>Minum Air Cukup</th><th>Catatan Singkat</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </body>
+      </html>
+    `;
+    downloadBlob(html, '30-Day-Mood-Burnout-Tracker.xls', 'application/vnd.ms-excel;charset=utf-8;');
+    showToast(L('File Excel (.xls) berhasil diunduh.', 'Excel (.xls) file downloaded.'));
+  }
+
+  function exportJSON() {
+    const payload = {
+      app: '30-Day Mood & Burnout Reset Tracker',
+      exportedAt: new Date().toISOString(),
+      account: state.currentUser,
+      data: state.userData
+    };
+    downloadBlob(JSON.stringify(payload, null, 2), 'mood-tracker-cloud-backup.json', 'application/json');
+    showToast(L('Cadangan JSON berhasil diunduh.', 'JSON backup downloaded.'));
+  }
+
+  function importJSON(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        const imported = parsed.data || parsed;
+        if (!Array.isArray(imported.days) || imported.days.length !== 30) {
+          throw new Error('Invalid structure');
+        }
+        state.userData = { ...createEmptyUserData(), ...imported };
+        persistUserData(false);
+        renderActiveViewport();
+        showToast(L('Cadangan JSON berhasil dipulihkan!', 'JSON backup restored!'));
+      } catch (err) {
+        showToast(L('Format file JSON tidak valid.', 'Invalid JSON backup file.'));
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  /* ==================== MODAL HELPERS ==================== */
+  function openModal(html) {
+    const backdrop = document.getElementById('modalBackdrop');
+    document.getElementById('modalBox').innerHTML = html;
+    backdrop.classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalBackdrop').classList.remove('open');
+  }
+
+  /* ==================== PUBLIC APP API ==================== */
+  window.App = {
+    openTab,
+    activateTab,
+    closeTab,
+    closeModal,
+
+    goBack() {
+      if (state.historyIdx > 0) {
+        state.historyIdx--;
+        const routeId = state.history[state.historyIdx];
+        openTab(routeId, false);
+      }
+    },
+
+    goForward() {
+      if (state.historyIdx < state.history.length - 1) {
+        state.historyIdx++;
+        const routeId = state.history[state.historyIdx];
+        openTab(routeId, false);
+      }
+    },
+
+    refreshCurrentTab() {
+      persistUserData(true);
+      renderActiveViewport();
+      showToast(L('Halaman diperbarui & tersinkron ke Cloud.', 'Page reloaded & synced to Cloud.'));
+    },
+
+    handleOmniboxKey(e) {
+      if (e.key !== 'Enter') return;
+      const val = e.target.value.toLowerCase().trim();
+      const map = [
+        ['dashboard', 'dashboard'],
+        ['panduan', 'panduan'],
+        ['guide', 'panduan'],
+        ['harian', 'harian'],
+        ['daily', 'harian'],
+        ['hasil', 'hasil'],
+        ['chart', 'hasil'],
+        ['ilmiah', 'ilmiah'],
+        ['science', 'ilmiah'],
+        ['refleksi', 'refleksi'],
+        ['reflect', 'refleksi'],
+        ['akun', 'akun'],
+        ['account', 'akun'],
+        ['pengaturan', 'pengaturan'],
+        ['setting', 'pengaturan'],
+        ['newtab', 'newtab']
+      ];
+      const match = map.find(([k]) => val.includes(k));
+      if (match) {
+        openTab(match[1]);
+      } else {
+        showToast(L('Rute tidak ditemukan. Membuka Dashboard.', 'Route not found. Opening Dashboard.'));
+        openTab('dashboard');
+      }
+    },
+
+    toggleTheme() {
+      state.settings.theme = state.settings.theme === 'dark' ? 'light' : 'dark';
+      saveSettings();
+      if (state.currentUser) renderActiveViewport();
+    },
+
+    setTheme(theme) {
+      state.settings.theme = theme;
+      saveSettings();
+      renderActiveViewport();
+    },
+
+    toggleLang() {
+      state.settings.lang = state.settings.lang === 'id' ? 'en' : 'id';
+      saveSettings();
+      if (state.currentUser) {
+        renderChromeBar();
+        renderActiveViewport();
+      }
+      showToast(t('lang_switched'));
+    },
+
+    setLang(lang) {
+      state.settings.lang = lang;
+      saveSettings();
+      renderChromeBar();
+      renderActiveViewport();
+      showToast(t('lang_switched'));
+    },
+
+    setClientId(val) {
+      state.settings.googleClientId = val.trim();
+      saveSettings();
+      showToast(L('Client ID disimpan.', 'Client ID saved.'));
+    },
+
+    toggleCompact() {
+      state.settings.compact = !state.settings.compact;
+      document.body.style.fontSize = state.settings.compact ? '13px' : '';
+      showToast(L('Mode tampilan diubah.', 'View density toggled.'));
+    },
+
+    toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {});
+      } else {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    },
+
+    /* Login Actions */
+    openGoogleAccountModal,
+    submitGoogleModal() {
+      const name = document.getElementById('gNameInput').value.trim();
+      const email = document.getElementById('gEmailInput').value.trim().toLowerCase();
+      if (!name || !email || !email.includes('@')) {
+        showToast(L('Mohon isi nama dan alamat email yang valid.', 'Please enter a valid name and email.'));
+        return;
+      }
+      const colors = ['#1a73e8', '#0f6b78', '#188038', '#e37400', '#1f4e78'];
+      const color = colors[email.length % colors.length];
+      closeModal();
+      completeLogin({ name, email, color }, false);
+    },
+
+    loginExisting(email) {
+      const found = state.accounts.find(a => a.email === email);
+      if (found) completeLogin(found, false);
+    },
+
+    loginDemo() {
+      completeLogin({
+        name: 'Pengguna Demo',
+        email: 'demo.cloud@gmail.com',
+        color: '#0f6b78'
+      }, true);
+    },
+
+    logout() {
+      localStorage.removeItem(KEYS.SESSION);
+      state.currentUser = null;
+      document.getElementById('chromeShell').style.display = 'none';
+      document.getElementById('loginOverlay').classList.remove('hidden');
+      renderSavedAccounts();
+      showToast(L('Anda telah keluar dari sesi Cloud.', 'Signed out of Cloud session.'));
+    },
+
+    manualSync() {
+      persistUserData(false);
+      renderActiveViewport();
+    },
+
+    /* Daily Log Mutations */
+    setStartDate(val) {
+      state.userData.startDate = val;
+      persistUserData(true);
+      renderActiveViewport();
+    },
+
+    setHarianView(mode) {
+      state.harianViewMode = mode;
+      renderActiveViewport();
+    },
+
+    setHarianFilter(val) {
+      state.harianFilter = val;
+      renderActiveViewport();
+    },
+
+    setHarianSearch(val) {
+      state.harianSearch = val;
+      renderActiveViewport();
+    },
+
+    stepFocusDay(delta) {
+      state.focusDayIndex = Math.max(0, Math.min(29, state.focusDayIndex + delta));
+      renderActiveViewport();
+    },
+
+    jumpFocusDay(idx) {
+      state.focusDayIndex = Number(idx);
+      renderActiveViewport();
+    },
+
+    updateDayField(dayIdx, field, value, rerender = false) {
+      if (field === 'sleep' && value !== '') {
+        const num = Number(value);
+        if (isNaN(num) || num < 0 || num > 24) {
+          showToast(L('Jam tidur harus antara 0–24 jam.', 'Sleep hours must be between 0–24.'));
+          return;
+        }
+      }
+      state.userData.days[dayIdx][field] = value;
+      persistUserData(true);
+      if (rerender) renderActiveViewport();
+    },
+
+    cycleHabit(dayIdx, field, rerender = true) {
+      const cur = state.userData.days[dayIdx][field];
+      const next = cur === '' ? 'Ya' : cur === 'Ya' ? 'Tidak' : '';
+      state.userData.days[dayIdx][field] = next;
+      persistUserData(true);
+      if (rerender) renderActiveViewport();
+    },
+
+    updateReflection(key, value) {
+      state.userData.reflections[key] = value;
+      persistUserData(true);
+    },
+
+    updateFeedback(key, value) {
+      state.userData.feedback[key] = value;
+      persistUserData(true);
+    },
+
+    loadSampleIntoCurrent() {
+      const demo = createDemoUserData();
+      state.userData = demo;
+      persistUserData(false);
+      renderActiveViewport();
+      showToast(L('Data contoh 14 hari berhasil dimuat!', '14-day sample data loaded!'));
+    },
+
+    confirmResetAll() {
+      openModal(`
+        <h3 style="font-size:17px;">⚠️ ${L('Konfirmasi Reset Data', 'Confirm Data Reset')}</h3>
+        <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.5;">
+          ${L('Semua catatan 30 hari dan refleksi mingguan untuk akun ini akan dikosongkan. Tindakan ini tidak dapat dibatalkan kecuali Anda memiliki cadangan JSON.', 'All 30-day entries and weekly reflections for this account will be cleared. This cannot be undone unless you have a JSON backup.')}
+        </p>
+        <div style="display:flex;justify-content:flex-end;gap:8px;">
+          <button class="btn btn-outline" onclick="App.closeModal()">${L('Batal', 'Cancel')}</button>
+          <button class="btn btn-danger" onclick="App.executeResetAll()">${L('Ya, Kosongkan Data', 'Yes, Clear Data')}</button>
+        </div>
+      `);
+    },
+
+    executeResetAll() {
+      state.userData = createEmptyUserData();
+      persistUserData(false);
+      closeModal();
+      renderActiveViewport();
+    },
+
+    exportCSV,
+    exportExcelXls,
+    exportJSON,
+    importJSON
+  };
+
+  /* ==================== BOOTSTRAP ==================== */
+  loadInitialStorage();
+  renderSavedAccounts();
+
+  if (state.currentUser) {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('chromeShell').style.display = 'flex';
+    document.getElementById('toolbarAvatar').textContent = state.currentUser.name.charAt(0).toUpperCase();
+    document.getElementById('toolbarAvatar').style.background = state.currentUser.color || '#1a73e8';
+    openTab('dashboard');
+  }
+
+  document.getElementById('modalBackdrop').addEventListener('click', e => {
+    if (e.target.id === 'modalBackdrop') closeModal();
+  });
+})();
+</script>
+</body>
+</html>
